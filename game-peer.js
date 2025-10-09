@@ -28,7 +28,7 @@ const wordDatabase = {
 
 // Game state
 let gameState = {
-    mode: 'local', // 'local' or 'online'
+    mode: 'local',
     theme: '',
     players: 0,
     impostors: 0,
@@ -45,9 +45,10 @@ let gameState = {
     isHost: false
 };
 
-// Online state
-let onlineRoom = null;
-let updateInterval = null;
+// PeerJS state
+let peer = null;
+let connections = [];
+let roomPlayers = {};
 
 // DOM Elements - Mode Selection
 const modeScreen = document.getElementById('mode-screen');
@@ -132,7 +133,8 @@ copyCodeBtn.addEventListener('click', () => {
 
 playerNameInput.addEventListener('input', (e) => {
     if (gameState.roomCode && e.target.value.trim()) {
-        updatePlayerName(e.target.value.trim());
+        gameState.playerName = e.target.value.trim();
+        broadcastPlayerUpdate();
     }
 });
 
@@ -158,67 +160,54 @@ backToLobbyBtn.addEventListener('click', () => {
     lobbyScreen.classList.remove('hidden');
 });
 
-// ========== ONLINE FUNCTIONS ==========
-
-function generateRoomCode() {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-function generatePlayerId() {
-    return 'player_' + Math.random().toString(36).substring(2, 11);
-}
+// ========== PEERJS ONLINE FUNCTIONS ==========
 
 function createRoom() {
-    if (!window.firebaseDB) {
-        alert('Firebase no está configurado. Por favor configura Firebase en index.html');
-        return;
-    }
-    
     const roomCode = generateRoomCode();
-    const playerId = generatePlayerId();
     
-    const room = {
-        code: roomCode,
-        host: playerId,
-        players: {},
-        theme: 'minecraft',
-        impostors: 1,
-        gameStarted: false,
-        gameData: null
-    };
+    // Crear peer con el código de sala como ID
+    peer = new Peer(roomCode, {
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        }
+    });
     
-    room.players[playerId] = {
-        id: playerId,
-        name: 'Anfitrión',
-        isHost: true
-    };
-    
-    // Guardar en Firebase
-    const roomRef = window.firebaseRef(window.firebaseDB, `rooms/${roomCode}`);
-    window.firebaseSet(roomRef, room).then(() => {
-        gameState.roomCode = roomCode;
-        gameState.playerId = playerId;
+    peer.on('open', (id) => {
+        gameState.roomCode = id;
+        gameState.playerId = 'host';
         gameState.isHost = true;
+        gameState.playerName = 'Anfitrión';
+        
+        roomPlayers[gameState.playerId] = {
+            id: gameState.playerId,
+            name: gameState.playerName,
+            isHost: true
+        };
         
         onlineRoomScreen.classList.add('hidden');
         lobbyScreen.classList.remove('hidden');
         
-        roomCodeDisplay.textContent = roomCode;
-        shareCode.textContent = roomCode;
+        roomCodeDisplay.textContent = id;
+        shareCode.textContent = id;
         hostControls.classList.remove('hidden');
         
-        startRoomSync();
-    }).catch((error) => {
-        alert('Error al crear sala: ' + error.message);
+        updatePlayersList();
+    });
+    
+    peer.on('connection', (conn) => {
+        handleNewConnection(conn);
+    });
+    
+    peer.on('error', (err) => {
+        console.error('Error de PeerJS:', err);
+        alert('Error al crear sala: ' + err.message);
     });
 }
 
 function joinRoom() {
-    if (!window.firebaseDB) {
-        alert('Firebase no está configurado. Por favor configura Firebase en index.html');
-        return;
-    }
-    
     const roomCode = roomCodeInput.value.trim().toUpperCase();
     
     if (!roomCode) {
@@ -226,28 +215,37 @@ function joinRoom() {
         return;
     }
     
-    // Buscar sala en Firebase
-    const roomRef = window.firebaseRef(window.firebaseDB, `rooms/${roomCode}`);
-    window.firebaseGet(roomRef).then((snapshot) => {
-        if (!snapshot.exists()) {
-            alert('Sala no encontrada');
-            return;
+    const playerId = generatePlayerId();
+    
+    peer = new Peer(playerId, {
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
         }
+    });
+    
+    peer.on('open', () => {
+        const conn = peer.connect(roomCode);
         
-        const room = snapshot.val();
-        const playerId = generatePlayerId();
-        
-        room.players[playerId] = {
-            id: playerId,
-            name: `Jugador ${Object.keys(room.players).length + 1}`,
-            isHost: false
-        };
-        
-        // Actualizar sala en Firebase
-        window.firebaseSet(roomRef, room).then(() => {
+        conn.on('open', () => {
             gameState.roomCode = roomCode;
             gameState.playerId = playerId;
             gameState.isHost = false;
+            gameState.playerName = `Jugador ${Math.floor(Math.random() * 1000)}`;
+            
+            // Enviar info al host
+            conn.send({
+                type: 'join',
+                player: {
+                    id: playerId,
+                    name: gameState.playerName,
+                    isHost: false
+                }
+            });
+            
+            connections.push(conn);
             
             onlineRoomScreen.classList.add('hidden');
             lobbyScreen.classList.remove('hidden');
@@ -256,63 +254,101 @@ function joinRoom() {
             shareCode.textContent = roomCode;
             hostControls.classList.add('hidden');
             
-            startRoomSync();
+            setupConnectionHandlers(conn);
         });
-    }).catch((error) => {
-        alert('Error al unirse a la sala: ' + error.message);
+        
+        conn.on('error', (err) => {
+            alert('No se pudo conectar a la sala. Verifica el código.');
+        });
     });
 }
 
-function startRoomSync() {
-    if (!window.firebaseDB) return;
+function handleNewConnection(conn) {
+    connections.push(conn);
     
-    // Escuchar cambios en tiempo real con Firebase
-    const roomRef = window.firebaseRef(window.firebaseDB, `rooms/${gameState.roomCode}`);
-    window.firebaseOnValue(roomRef, (snapshot) => {
-        if (!snapshot.exists()) {
-            alert('La sala ha sido cerrada');
-            leaveRoom();
-            return;
-        }
-        
-        const room = snapshot.val();
-        onlineRoom = room;
-        
-        // Update players list
-        playersList.innerHTML = '<h3>Jugadores en la sala:</h3>';
-        Object.values(room.players).forEach(player => {
-            const playerDiv = document.createElement('div');
-            playerDiv.className = `player-item ${player.isHost ? 'host' : ''}`;
-            playerDiv.innerHTML = `
-                <span>${player.name}</span>
-                ${player.isHost ? '<span class="host-badge">ANFITRIÓN</span>' : ''}
-            `;
-            playersList.appendChild(playerDiv);
+    conn.on('open', () => {
+        // Enviar lista actual de jugadores al nuevo jugador
+        conn.send({
+            type: 'players_update',
+            players: roomPlayers
         });
-        
-        // Check if game started
-        if (room.gameStarted && room.gameData) {
-            loadOnlineGame(room.gameData);
+    });
+    
+    setupConnectionHandlers(conn);
+}
+
+function setupConnectionHandlers(conn) {
+    conn.on('data', (data) => {
+        switch(data.type) {
+            case 'join':
+                if (gameState.isHost) {
+                    roomPlayers[data.player.id] = data.player;
+                    updatePlayersList();
+                    broadcastPlayerUpdate();
+                }
+                break;
+                
+            case 'players_update':
+                roomPlayers = data.players;
+                updatePlayersList();
+                break;
+                
+            case 'player_name_update':
+                roomPlayers[data.playerId].name = data.name;
+                updatePlayersList();
+                break;
+                
+            case 'start_game':
+                loadOnlineGame(data.gameData);
+                break;
         }
+    });
+    
+    conn.on('close', () => {
+        connections = connections.filter(c => c !== conn);
     });
 }
 
-function updateLobby() {
-    // Ya no se usa, Firebase actualiza en tiempo real
+function updatePlayersList() {
+    playersList.innerHTML = '<h3>Jugadores en la sala:</h3>';
+    Object.values(roomPlayers).forEach(player => {
+        const playerDiv = document.createElement('div');
+        playerDiv.className = `player-item ${player.isHost ? 'host' : ''}`;
+        playerDiv.innerHTML = `
+            <span>${player.name}</span>
+            ${player.isHost ? '<span class="host-badge">ANFITRIÓN</span>' : ''}
+        `;
+        playersList.appendChild(playerDiv);
+    });
 }
 
-function updatePlayerName(name) {
-    if (!window.firebaseDB || !gameState.roomCode) return;
-    
-    const playerRef = window.firebaseRef(window.firebaseDB, `rooms/${gameState.roomCode}/players/${gameState.playerId}/name`);
-    window.firebaseSet(playerRef, name);
-    gameState.playerName = name;
+function broadcastPlayerUpdate() {
+    if (!gameState.isHost) {
+        // Si no eres host, envía tu actualización al host
+        if (connections[0]) {
+            connections[0].send({
+                type: 'player_name_update',
+                playerId: gameState.playerId,
+                name: gameState.playerName
+            });
+        }
+    } else {
+        // Si eres host, actualiza tu nombre y envía a todos
+        roomPlayers[gameState.playerId].name = gameState.playerName;
+        connections.forEach(conn => {
+            conn.send({
+                type: 'players_update',
+                players: roomPlayers
+            });
+        });
+        updatePlayersList();
+    }
 }
 
 function startOnlineGame() {
-    if (!onlineRoom) return;
+    if (!gameState.isHost) return;
     
-    const playerCount = Object.keys(onlineRoom.players).length;
+    const playerCount = Object.keys(roomPlayers).length;
     const impostorCount = parseInt(impostorsLobby.value);
     
     if (playerCount < 3) {
@@ -331,7 +367,7 @@ function startOnlineGame() {
     const civilianWord = words.splice(Math.floor(Math.random() * words.length), 1)[0];
     const impostorWord = "IMPOSTOR";
     
-    const playerIds = Object.keys(onlineRoom.players);
+    const playerIds = Object.keys(roomPlayers);
     const playerWords = {};
     const impostorIndices = [];
     
@@ -355,16 +391,18 @@ function startOnlineGame() {
         impostorWord,
         playerWords,
         impostorIndices,
-        players: onlineRoom.players
+        players: roomPlayers
     };
     
-    onlineRoom.gameStarted = true;
-    onlineRoom.gameData = gameData;
+    // Enviar a todos los jugadores
+    connections.forEach(conn => {
+        conn.send({
+            type: 'start_game',
+            gameData: gameData
+        });
+    });
     
-    // Actualizar en Firebase
-    const roomRef = window.firebaseRef(window.firebaseDB, `rooms/${gameState.roomCode}`);
-    window.firebaseSet(roomRef, onlineRoom);
-    
+    // Cargar para el host
     loadOnlineGame(gameData);
 }
 
@@ -388,28 +426,14 @@ function loadOnlineGame(gameData) {
 }
 
 function leaveRoom() {
-    if (updateInterval) {
-        clearInterval(updateInterval);
+    if (peer) {
+        peer.destroy();
+        peer = null;
     }
     
-    if (gameState.roomCode && window.firebaseDB) {
-        const roomRef = window.firebaseRef(window.firebaseDB, `rooms/${gameState.roomCode}`);
-        
-        window.firebaseGet(roomRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                const room = snapshot.val();
-                delete room.players[gameState.playerId];
-                
-                if (Object.keys(room.players).length === 0 || gameState.isHost) {
-                    // Eliminar sala si está vacía o si el host se va
-                    window.firebaseRemove(roomRef);
-                } else {
-                    // Actualizar sala sin el jugador
-                    window.firebaseSet(roomRef, room);
-                }
-            }
-        });
-    }
+    connections.forEach(conn => conn.close());
+    connections = [];
+    roomPlayers = {};
     
     lobbyScreen.classList.add('hidden');
     onlineGameScreen.classList.add('hidden');
@@ -418,7 +442,14 @@ function leaveRoom() {
     gameState.roomCode = '';
     gameState.playerId = '';
     gameState.isHost = false;
-    onlineRoom = null;
+}
+
+function generateRoomCode() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function generatePlayerId() {
+    return 'player_' + Math.random().toString(36).substring(2, 11);
 }
 
 // ========== LOCAL GAME FUNCTIONS ==========
@@ -580,9 +611,14 @@ function revealImpostors() {
 }
 
 function resetGame() {
-    if (updateInterval) {
-        clearInterval(updateInterval);
+    if (peer) {
+        peer.destroy();
+        peer = null;
     }
+    
+    connections.forEach(conn => conn.close());
+    connections = [];
+    roomPlayers = {};
     
     gameState = {
         mode: 'local',
@@ -614,5 +650,5 @@ function resetGame() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Juego del Impostor cargado');
+    console.log('Juego del Impostor con PeerJS cargado');
 });
