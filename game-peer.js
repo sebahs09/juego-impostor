@@ -91,14 +91,8 @@ const onlinePlayerName = document.getElementById('online-player-name');
 const readyStatus = document.getElementById('ready-status');
 const backToLobbyBtn = document.getElementById('back-to-lobby');
 
-// DOM Elements - Voting & Results
-const votingScreen = document.getElementById('voting-screen');
-const votingOptions = document.getElementById('voting-options');
-const resultsScreen = document.getElementById('results-screen');
-const resultsContent = document.getElementById('results-content');
+// DOM Elements - Game Controls
 const nextPlayerButton = document.getElementById('next-player');
-const startVotingButton = document.getElementById('start-voting');
-const revealImpostorsButton = document.getElementById('reveal-impostors');
 const playAgainButton = document.getElementById('play-again');
 
 // Event Listeners - Mode Selection
@@ -151,10 +145,24 @@ startButton.addEventListener('click', startLocalGame);
 
 // Event Listeners - Game
 nextPlayerButton.addEventListener('click', nextPlayer);
-startVotingButton.addEventListener('click', showVotingScreen);
-revealImpostorsButton.addEventListener('click', revealImpostors);
 playAgainButton.addEventListener('click', resetGame);
 gameScreen.addEventListener('click', revealWord);
+
+// Event Listener - Online Game (mostrar/ocultar palabra)
+let wordVisible = true;
+onlineGameScreen.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    
+    wordVisible = !wordVisible;
+    if (wordVisible) {
+        wordDisplayOnline.style.opacity = '1';
+        wordDisplayOnline.textContent = wordDisplayOnline.dataset.word;
+    } else {
+        wordDisplayOnline.style.opacity = '0.1';
+        wordDisplayOnline.textContent = '***';
+    }
+});
+
 backToLobbyBtn.addEventListener('click', () => {
     onlineGameScreen.classList.add('hidden');
     lobbyScreen.classList.remove('hidden');
@@ -415,10 +423,14 @@ function loadOnlineGame(gameData) {
     
     onlinePlayerName.textContent = gameState.playerName || 'Jugador';
     wordDisplayOnline.textContent = myWord;
+    wordDisplayOnline.dataset.word = myWord; // Guardar palabra original
     wordDisplayOnline.style.color = isImpostor ? '#ef4444' : '#10b981';
+    wordDisplayOnline.style.opacity = '1';
+    wordVisible = true;
     
     readyStatus.innerHTML = `
         <p>Todos los jugadores han recibido sus palabras</p>
+        <p><strong>Toca la pantalla para ocultar/mostrar tu palabra</strong></p>
         <p>Discutan y descubran quién es el impostor</p>
     `;
     
@@ -491,7 +503,7 @@ function startLocalGame() {
     currentPlayerNumber.textContent = gameState.currentPlayer;
     revealCard.classList.add('hidden');
     nextPlayerButton.classList.add('hidden');
-    startVotingButton.classList.add('hidden');
+    playAgainButton.classList.add('hidden');
 }
 
 function revealWord(e) {
@@ -516,7 +528,8 @@ function revealWord(e) {
     if (gameState.currentPlayer < gameState.players) {
         nextPlayerButton.classList.remove('hidden');
     } else {
-        startVotingButton.classList.remove('hidden');
+        // Ya no hay votación, solo mostrar botón de jugar de nuevo
+        playAgainButton.classList.remove('hidden');
     }
 }
 
@@ -527,87 +540,8 @@ function nextPlayer() {
     currentPlayerNumber.textContent = gameState.currentPlayer;
     revealCard.classList.add('hidden');
     nextPlayerButton.classList.add('hidden');
+    playAgainButton.classList.add('hidden');
     wordDisplay.textContent = '';
-}
-
-function showVotingScreen() {
-    gameScreen.classList.add('hidden');
-    votingScreen.classList.remove('hidden');
-    
-    votingOptions.innerHTML = '';
-    
-    for (let i = 1; i <= gameState.players; i++) {
-        const option = document.createElement('div');
-        option.className = 'vote-card';
-        option.textContent = `Jugador ${i}`;
-        option.dataset.player = i;
-        option.onclick = () => castVote(i, option);
-        votingOptions.appendChild(option);
-    }
-}
-
-function castVote(playerNumber, element) {
-    if (!gameState.votes[playerNumber]) {
-        gameState.votes[playerNumber] = 0;
-    }
-    gameState.votes[playerNumber]++;
-    
-    element.textContent = `Jugador ${playerNumber} (${gameState.votes[playerNumber]} votos)`;
-    element.classList.add('voted');
-}
-
-function revealImpostors() {
-    let maxVotes = 0;
-    let mostVotedPlayers = [];
-    
-    for (const [player, votes] of Object.entries(gameState.votes)) {
-        if (votes > maxVotes) {
-            maxVotes = votes;
-            mostVotedPlayers = [parseInt(player)];
-        } else if (votes === maxVotes) {
-            mostVotedPlayers.push(parseInt(player));
-        }
-    }
-    
-    let resultsHTML = '<div class="results-content">';
-    
-    if (mostVotedPlayers.length > 0) {
-        resultsHTML += `<h3>Más votado(s): Jugador ${mostVotedPlayers.join(', ')}</h3>`;
-    } else {
-        resultsHTML += '<h3>¡Nadie recibió votos!</h3>';
-    }
-    
-    resultsHTML += '<br><h3>Revelación:</h3>';
-    
-    for (let i = 0; i < gameState.players; i++) {
-        const isImpostor = gameState.impostorIndices.includes(i);
-        const word = gameState.playerWords[i];
-        const className = isImpostor ? 'impostor' : 'civilian';
-        const role = isImpostor ? 'IMPOSTOR' : 'CIVIL';
-        
-        resultsHTML += `
-            <div class="result-item ${className}">
-                <strong>Jugador ${i + 1}:</strong> ${word} - ${role}
-            </div>
-        `;
-    }
-    
-    const correctVotes = mostVotedPlayers.filter(p => gameState.impostorIndices.includes(p - 1));
-    
-    if (correctVotes.length > 0) {
-        resultsHTML += '<br><h2 style="color: #2ecc71;">¡Los Civiles Ganan! 🎉</h2>';
-        resultsHTML += '<p>Atraparon al impostor correctamente</p>';
-    } else {
-        resultsHTML += '<br><h2 style="color: #e74c3c;">¡Los Impostores Ganan! 😈</h2>';
-        resultsHTML += '<p>Los civiles votaron incorrectamente</p>';
-    }
-    
-    resultsHTML += '</div>';
-    
-    resultsContent.innerHTML = resultsHTML;
-    
-    votingScreen.classList.add('hidden');
-    resultsScreen.classList.remove('hidden');
 }
 
 function resetGame() {
@@ -638,8 +572,6 @@ function resetGame() {
         isHost: false
     };
     
-    resultsScreen.classList.add('hidden');
-    votingScreen.classList.add('hidden');
     gameScreen.classList.add('hidden');
     onlineGameScreen.classList.add('hidden');
     lobbyScreen.classList.add('hidden');
