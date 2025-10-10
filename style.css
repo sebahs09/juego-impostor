@@ -54,9 +54,11 @@ body::before {
 
 .screen {
     display: flex;
+    flex-direction: column;
     gap: 20px;
     align-items: center;
     text-align: center;
+    width: 100%;
 }
 
 .hidden {
