@@ -579,6 +579,9 @@ function startOnlineGame() {
         }
     }
     
+    // Crear orden aleatorio de turnos
+    const shuffledPlayerIds = [...playerIds].sort(() => Math.random() - 0.5);
+    
     const gameData = {
         theme,
         civilianWord,
@@ -586,7 +589,8 @@ function startOnlineGame() {
         playerWords,
         impostorIndices,
         players: roomPlayers,
-        mode: gameState.onlineMode
+        mode: gameState.onlineMode,
+        turnOrder: shuffledPlayerIds // Orden aleatorio
     };
     
     connections.forEach(conn => {
@@ -610,8 +614,8 @@ function loadOnlineGame(gameData) {
         roomPlayers = gameData.players;
     }
     
-    // Inicializar orden de turnos
-    playerOrder = Object.keys(roomPlayers);
+    // Usar orden aleatorio de turnos del host
+    playerOrder = gameData.turnOrder || Object.keys(roomPlayers);
     currentTurnIndex = 0;
     turnsFinished = false;
     
@@ -655,13 +659,24 @@ function updateCurrentTurn(mode) {
     if (!currentPlayer) return;
     
     const isMyTurn = currentPlayerId === gameState.playerId;
+    const isLastTurn = currentTurnIndex === playerOrder.length - 1;
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
-        nextTurnOralBtn.classList.toggle('hidden', !isMyTurn);
+        if (isMyTurn) {
+            nextTurnOralBtn.classList.remove('hidden');
+            nextTurnOralBtn.textContent = isLastTurn ? 'Iniciar Discusión' : 'Pasar Turno';
+        } else {
+            nextTurnOralBtn.classList.add('hidden');
+        }
     } else {
         currentTurnChat.textContent = currentPlayer.name;
-        nextTurnChatBtn.classList.toggle('hidden', !isMyTurn);
+        if (isMyTurn) {
+            nextTurnChatBtn.classList.remove('hidden');
+            nextTurnChatBtn.textContent = isLastTurn ? 'Iniciar Votación' : 'Pasar Turno';
+        } else {
+            nextTurnChatBtn.classList.add('hidden');
+        }
     }
 }
 
@@ -846,13 +861,21 @@ function leaveRoom() {
     
     connections.forEach(conn => conn.close());
     connections = [];
+    
+    // Limpiar registro temporal de la sala
     roomPlayers = {};
     chatMessages = [];
+    liveChatHistory = [];
+    playerOrder = [];
+    currentTurnIndex = 0;
+    turnsFinished = false;
     
     lobbyScreen.classList.add('hidden');
     onlineGameScreen.classList.add('hidden');
     chatGameScreen.classList.add('hidden');
     votingScreen.classList.add('hidden');
+    toggleChatBtn.classList.add('hidden');
+    liveChatWidget.classList.add('hidden');
     modeScreen.classList.remove('hidden');
     
     gameState.roomCode = '';
@@ -955,8 +978,14 @@ function resetGame() {
     
     connections.forEach(conn => conn.close());
     connections = [];
+    
+    // Limpiar registro temporal completo
     roomPlayers = {};
     chatMessages = [];
+    liveChatHistory = [];
+    playerOrder = [];
+    currentTurnIndex = 0;
+    turnsFinished = false;
     
     gameState = {
         mode: 'local',
@@ -985,6 +1014,8 @@ function resetGame() {
     setupScreen.classList.add('hidden');
     onlineRoomScreen.classList.add('hidden');
     onlineModeScreen.classList.add('hidden');
+    toggleChatBtn.classList.add('hidden');
+    liveChatWidget.classList.add('hidden');
     modeScreen.classList.remove('hidden');
 }
 
