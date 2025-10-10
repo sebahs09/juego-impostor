@@ -89,6 +89,11 @@ let currentTurnIndex = 0;
 let playerOrder = [];
 let turnsFinished = false;
 
+// DOM Elements - Name Screen
+const nameScreen = document.getElementById('name-screen');
+const playerNameInput = document.getElementById('player-name-input');
+const continueBtn = document.getElementById('continue-btn');
+
 // DOM Elements - Mode Selection
 const modeScreen = document.getElementById('mode-screen');
 const localModeBtn = document.getElementById('local-mode-btn');
@@ -123,7 +128,7 @@ const lobbyScreen = document.getElementById('lobby-screen');
 const roomCodeDisplay = document.getElementById('room-code-display');
 const shareCode = document.getElementById('share-code');
 const copyCodeBtn = document.getElementById('copy-code-btn');
-const playerNameInput = document.getElementById('player-name');
+const playerNameLobby = document.getElementById('player-name');
 const playersList = document.getElementById('players-list');
 const hostControls = document.getElementById('host-controls');
 const themeLobby = document.getElementById('theme-lobby');
@@ -220,7 +225,25 @@ copyCodeBtn.addEventListener('click', () => {
     }, 2000);
 });
 
-playerNameInput.addEventListener('input', (e) => {
+// Event Listener - Name Screen
+continueBtn.addEventListener('click', () => {
+    const name = playerNameInput.value.trim();
+    if (name) {
+        gameState.playerName = name;
+        nameScreen.classList.add('hidden');
+        modeScreen.classList.remove('hidden');
+    } else {
+        showToast('Por favor ingresa tu nombre', 'error', 'Nombre requerido');
+    }
+});
+
+playerNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        continueBtn.click();
+    }
+});
+
+playerNameLobby.addEventListener('input', (e) => {
     if (gameState.roomCode && e.target.value.trim()) {
         gameState.playerName = e.target.value.trim();
         broadcastPlayerUpdate();
@@ -318,7 +341,7 @@ function createRoom() {
         gameState.roomCode = id;
         gameState.playerId = 'host';
         gameState.isHost = true;
-        gameState.playerName = 'Anfitrión';
+        // Usar el nombre ingresado al inicio
         
         roomPlayers[gameState.playerId] = {
             id: gameState.playerId,
@@ -332,6 +355,7 @@ function createRoom() {
         
         roomCodeDisplay.textContent = id;
         shareCode.textContent = id;
+        playerNameLobby.value = gameState.playerName;
         hostControls.classList.remove('hidden');
         
         updatePlayersList();
@@ -374,7 +398,7 @@ function joinRoom() {
             gameState.roomCode = roomCode;
             gameState.playerId = playerId;
             gameState.isHost = false;
-            gameState.playerName = `Jugador ${Math.floor(Math.random() * 1000)}`;
+            // Usar el nombre ingresado al inicio
             
             conn.send({
                 type: 'join',
@@ -393,6 +417,7 @@ function joinRoom() {
             
             roomCodeDisplay.textContent = roomCode;
             shareCode.textContent = roomCode;
+            playerNameLobby.value = gameState.playerName;
             hostControls.classList.add('hidden');
             
             setupConnectionHandlers(conn);

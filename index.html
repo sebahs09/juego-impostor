@@ -9,8 +9,18 @@
 </head>
 <body>
     <div class="container">
+        <!-- Name Input Screen -->
+        <div id="name-screen" class="screen">
+            <h1>El Juego del Impostor</h1>
+            <p class="instruction">¿Cómo te llamas?</p>
+            <div class="form-group">
+                <input type="text" id="player-name-input" class="form-control" placeholder="Tu nombre" maxlength="20" autofocus>
+            </div>
+            <button id="continue-btn" class="btn">Continuar</button>
+        </div>
+
         <!-- Mode Selection Screen -->
-        <div id="mode-screen" class="screen">
+        <div id="mode-screen" class="screen hidden">
             <h1>El Juego del Impostor</h1>
             <p class="instruction">Selecciona el modo de juego</p>
             <div class="mode-buttons">
