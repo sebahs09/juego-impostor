@@ -610,6 +610,10 @@ function loadOnlineGame(gameData) {
     currentTurnIndex = 0;
     turnsFinished = false;
     
+    console.log('Player Order:', playerOrder);
+    console.log('My Player ID:', gameState.playerId);
+    console.log('Current Turn Index:', currentTurnIndex);
+    
     if (gameData.mode === 'oral') {
         onlineGameScreen.classList.remove('hidden');
         onlinePlayerName.textContent = gameState.playerName || 'Jugador';
@@ -646,14 +650,20 @@ function updateCurrentTurn(mode) {
     const currentPlayer = roomPlayers[currentPlayerId];
     const isMyTurn = currentPlayerId === gameState.playerId;
     
+    console.log('Update Turn - Current Player ID:', currentPlayerId);
+    console.log('Update Turn - My Player ID:', gameState.playerId);
+    console.log('Update Turn - Is My Turn:', isMyTurn);
+    
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
         // Mostrar/ocultar botón según si es tu turno
         if (isMyTurn) {
             nextTurnOralBtn.classList.remove('hidden');
             nextTurnOralBtn.textContent = 'Pasar Turno';
+            console.log('Showing button for oral mode');
         } else {
             nextTurnOralBtn.classList.add('hidden');
+            console.log('Hiding button for oral mode');
         }
     } else {
         currentTurnChat.textContent = currentPlayer.name;
@@ -661,8 +671,10 @@ function updateCurrentTurn(mode) {
         if (isMyTurn) {
             nextTurnChatBtn.classList.remove('hidden');
             nextTurnChatBtn.textContent = 'Pasar Turno';
+            console.log('Showing button for chat mode');
         } else {
             nextTurnChatBtn.classList.add('hidden');
+            console.log('Hiding button for chat mode');
         }
     }
 }
