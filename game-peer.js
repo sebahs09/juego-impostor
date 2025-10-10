@@ -684,14 +684,21 @@ function updateCurrentTurn(mode) {
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
         if (isMyTurn) {
+            console.log('Showing ORAL button');
+            console.log('Button element:', nextTurnOralBtn);
             nextTurnOralBtn.classList.remove('hidden');
+            console.log('Button classes after:', nextTurnOralBtn.className);
         } else {
             nextTurnOralBtn.classList.add('hidden');
         }
     } else {
         currentTurnChat.textContent = currentPlayer.name;
         if (isMyTurn) {
+            console.log('Showing CHAT button');
+            console.log('Button element:', nextTurnChatBtn);
             nextTurnChatBtn.classList.remove('hidden');
+            console.log('Button classes after:', nextTurnChatBtn.className);
+            console.log('Button style display:', nextTurnChatBtn.style.display);
         } else {
             nextTurnChatBtn.classList.add('hidden');
         }
