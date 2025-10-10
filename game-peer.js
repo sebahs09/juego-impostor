@@ -1,3 +1,37 @@
+// Toast Notification System
+function showToast(message, type = 'info', title = '') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = {
+        error: '❌',
+        success: '✅',
+        info: 'ℹ️'
+    };
+    
+    const titles = {
+        error: title || 'Error',
+        success: title || 'Éxito',
+        info: title || 'Información'
+    };
+    
+    toast.innerHTML = `
+        <div class="toast-icon">${icons[type]}</div>
+        <div class="toast-content">
+            <div class="toast-title">${titles[type]}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
 // Database of words by theme
 const wordDatabase = {
     minecraft: [
@@ -309,7 +343,7 @@ function createRoom() {
     
     peer.on('error', (err) => {
         console.error('Error de PeerJS:', err);
-        alert('Error al crear sala: ' + err.message);
+        showToast('No se pudo crear la sala. Intenta de nuevo.', 'error', 'Error de Conexión');
     });
 }
 
@@ -317,7 +351,7 @@ function joinRoom() {
     const roomCode = roomCodeInput.value.trim().toUpperCase();
     
     if (!roomCode) {
-        alert('Por favor ingresa un código de sala');
+        showToast('Por favor ingresa un código de sala válido', 'error', 'Código Requerido');
         return;
     }
     
@@ -364,7 +398,7 @@ function joinRoom() {
         });
         
         conn.on('error', (err) => {
-            alert('No se pudo conectar a la sala. Verifica el código.');
+            showToast('No se pudo conectar. Verifica el código de sala.', 'error', 'Error de Conexión');
         });
     });
 }
@@ -509,12 +543,12 @@ function startOnlineGame() {
     const impostorCount = parseInt(impostorsLobby.value);
     
     if (playerCount < 3) {
-        alert('Se necesitan al menos 3 jugadores');
+        showToast('Se necesitan al menos 3 jugadores para comenzar', 'error', 'Jugadores Insuficientes');
         return;
     }
     
     if (playerCount <= impostorCount) {
-        alert('Debe haber al menos un jugador más que la cantidad de impostores');
+        showToast('Debe haber más civiles que impostores', 'error', 'Configuración Inválida');
         return;
     }
     
@@ -816,7 +850,7 @@ function startLocalGame() {
     const impostors = parseInt(document.getElementById('impostors').value);
 
     if (players <= impostors) {
-        alert('Debe haber al menos un jugador más que la cantidad de impostores');
+        showToast('Debe haber más civiles que impostores', 'error', 'Configuración Inválida');
         return;
     }
 
