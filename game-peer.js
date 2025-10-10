@@ -29,6 +29,7 @@ const wordDatabase = {
 // Game state
 let gameState = {
     mode: 'local',
+    onlineMode: 'oral', // 'oral' or 'chat'
     theme: '',
     players: 0,
     impostors: 0,
@@ -49,18 +50,39 @@ let gameState = {
 let peer = null;
 let connections = [];
 let roomPlayers = {};
+let chatMessages = [];
+let currentTurnIndex = 0;
+let playerOrder = [];
+let turnsFinished = false;
 
 // DOM Elements - Mode Selection
 const modeScreen = document.getElementById('mode-screen');
 const localModeBtn = document.getElementById('local-mode-btn');
 const onlineModeBtn = document.getElementById('online-mode-btn');
 
+// DOM Elements - Online Mode Selection
+const onlineModeScreen = document.getElementById('online-mode-screen');
+const oralModeBtn = document.getElementById('oral-mode-btn');
+const chatModeBtn = document.getElementById('chat-mode-btn');
+const backFromOnlineModeBtn = document.getElementById('back-from-online-mode');
+
+// DOM Elements - Turns
+const turnSectionOral = document.getElementById('turn-section-oral');
+const turnSectionChat = document.getElementById('turn-section-chat');
+const currentTurnOral = document.getElementById('current-turn-oral');
+const currentTurnChat = document.getElementById('current-turn-chat');
+const nextTurnOralBtn = document.getElementById('next-turn-oral-btn');
+const nextTurnChatBtn = document.getElementById('next-turn-chat-btn');
+const discussionSectionOral = document.getElementById('discussion-section-oral');
+const discussionSectionChat = document.getElementById('discussion-section-chat');
+
 // DOM Elements - Online
 const onlineRoomScreen = document.getElementById('online-room-screen');
+const onlineRoomTitle = document.getElementById('online-room-title');
 const createRoomBtn = document.getElementById('create-room-btn');
 const joinRoomBtn = document.getElementById('join-room-btn');
 const roomCodeInput = document.getElementById('room-code');
-const backToModeBtn = document.getElementById('back-to-mode');
+const backToOnlineModeBtn = document.getElementById('back-to-online-mode');
 
 // DOM Elements - Lobby
 const lobbyScreen = document.getElementById('lobby-screen');
@@ -83,13 +105,32 @@ const startButton = document.getElementById('start-game');
 // DOM Elements - Game Screens
 const gameScreen = document.getElementById('game-screen');
 const onlineGameScreen = document.getElementById('online-game-screen');
+const chatGameScreen = document.getElementById('chat-game-screen');
 const currentPlayerNumber = document.getElementById('current-player-number');
 const revealCard = document.getElementById('reveal-card');
 const wordDisplay = document.getElementById('word-display');
 const wordDisplayOnline = document.getElementById('word-display-online');
+const wordDisplayChat = document.getElementById('word-display-chat');
 const onlinePlayerName = document.getElementById('online-player-name');
+const chatPlayerName = document.getElementById('chat-player-name');
 const readyStatus = document.getElementById('ready-status');
 const backToLobbyBtn = document.getElementById('back-to-lobby');
+const backToLobbyChatBtn = document.getElementById('back-to-lobby-chat');
+const toggleWordBtn = document.getElementById('toggle-word-btn');
+const toggleWordChatBtn = document.getElementById('toggle-word-chat-btn');
+
+// DOM Elements - Chat
+const chatMessagesDiv = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const sendMessageBtn = document.getElementById('send-message-btn');
+const startVoteBtn = document.getElementById('start-vote-btn');
+
+// DOM Elements - Voting
+const votingScreen = document.getElementById('voting-screen');
+const votingOptions = document.getElementById('voting-options');
+const voteResults = document.getElementById('vote-results');
+const revealResultsBtn = document.getElementById('reveal-results-btn');
+const backFromVoteBtn = document.getElementById('back-from-vote');
 
 // DOM Elements - Game Controls
 const nextPlayerButton = document.getElementById('next-player');
@@ -105,15 +146,35 @@ localModeBtn.addEventListener('click', () => {
 onlineModeBtn.addEventListener('click', () => {
     gameState.mode = 'online';
     modeScreen.classList.add('hidden');
+    onlineModeScreen.classList.remove('hidden');
+});
+
+// Event Listeners - Online Mode Selection
+oralModeBtn.addEventListener('click', () => {
+    gameState.onlineMode = 'oral';
+    onlineModeScreen.classList.add('hidden');
     onlineRoomScreen.classList.remove('hidden');
+    onlineRoomTitle.textContent = 'Modo Oral - Online';
+});
+
+chatModeBtn.addEventListener('click', () => {
+    gameState.onlineMode = 'chat';
+    onlineModeScreen.classList.add('hidden');
+    onlineRoomScreen.classList.remove('hidden');
+    onlineRoomTitle.textContent = 'Modo Chat - Online';
+});
+
+backFromOnlineModeBtn.addEventListener('click', () => {
+    onlineModeScreen.classList.add('hidden');
+    modeScreen.classList.remove('hidden');
 });
 
 // Event Listeners - Online Room
 createRoomBtn.addEventListener('click', createRoom);
 joinRoomBtn.addEventListener('click', joinRoom);
-backToModeBtn.addEventListener('click', () => {
+backToOnlineModeBtn.addEventListener('click', () => {
     onlineRoomScreen.classList.add('hidden');
-    modeScreen.classList.remove('hidden');
+    onlineModeScreen.classList.remove('hidden');
 });
 
 // Event Listeners - Lobby
@@ -148,18 +209,33 @@ nextPlayerButton.addEventListener('click', nextPlayer);
 playAgainButton.addEventListener('click', resetGame);
 gameScreen.addEventListener('click', revealWord);
 
-// Event Listener - Online Game (mostrar/ocultar palabra)
+// Event Listeners - Toggle Word (Oral Mode)
 let wordVisible = true;
-onlineGameScreen.addEventListener('click', (e) => {
-    if (e.target.tagName === 'BUTTON') return;
-    
+toggleWordBtn.addEventListener('click', () => {
     wordVisible = !wordVisible;
     if (wordVisible) {
         wordDisplayOnline.style.opacity = '1';
         wordDisplayOnline.textContent = wordDisplayOnline.dataset.word;
+        toggleWordBtn.textContent = '👁️ Ocultar Palabra';
     } else {
-        wordDisplayOnline.style.opacity = '0.1';
+        wordDisplayOnline.style.opacity = '0.2';
         wordDisplayOnline.textContent = '***';
+        toggleWordBtn.textContent = '👁️ Mostrar Palabra';
+    }
+});
+
+// Event Listeners - Toggle Word (Chat Mode)
+let wordVisibleChat = true;
+toggleWordChatBtn.addEventListener('click', () => {
+    wordVisibleChat = !wordVisibleChat;
+    if (wordVisibleChat) {
+        wordDisplayChat.style.opacity = '1';
+        wordDisplayChat.textContent = wordDisplayChat.dataset.word;
+        toggleWordChatBtn.textContent = '👁️ Ocultar Palabra';
+    } else {
+        wordDisplayChat.style.opacity = '0.2';
+        wordDisplayChat.textContent = '***';
+        toggleWordChatBtn.textContent = '👁️ Mostrar Palabra';
     }
 });
 
@@ -168,12 +244,33 @@ backToLobbyBtn.addEventListener('click', () => {
     lobbyScreen.classList.remove('hidden');
 });
 
+backToLobbyChatBtn.addEventListener('click', () => {
+    chatGameScreen.classList.add('hidden');
+    lobbyScreen.classList.remove('hidden');
+});
+
+// Event Listeners - Turns
+nextTurnOralBtn.addEventListener('click', () => nextTurn('oral'));
+nextTurnChatBtn.addEventListener('click', () => nextTurn('chat'));
+
+// Event Listeners - Chat
+sendMessageBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
+
+startVoteBtn.addEventListener('click', startVoting);
+revealResultsBtn.addEventListener('click', revealVoteResults);
+backFromVoteBtn.addEventListener('click', () => {
+    votingScreen.classList.add('hidden');
+    chatGameScreen.classList.remove('hidden');
+});
+
 // ========== PEERJS ONLINE FUNCTIONS ==========
 
 function createRoom() {
     const roomCode = generateRoomCode();
     
-    // Crear peer con el código de sala como ID
     peer = new Peer(roomCode, {
         config: {
             iceServers: [
@@ -192,7 +289,8 @@ function createRoom() {
         roomPlayers[gameState.playerId] = {
             id: gameState.playerId,
             name: gameState.playerName,
-            isHost: true
+            isHost: true,
+            connected: true
         };
         
         onlineRoomScreen.classList.add('hidden');
@@ -243,13 +341,13 @@ function joinRoom() {
             gameState.isHost = false;
             gameState.playerName = `Jugador ${Math.floor(Math.random() * 1000)}`;
             
-            // Enviar info al host
             conn.send({
                 type: 'join',
                 player: {
                     id: playerId,
                     name: gameState.playerName,
-                    isHost: false
+                    isHost: false,
+                    connected: true
                 }
             });
             
@@ -275,11 +373,17 @@ function handleNewConnection(conn) {
     connections.push(conn);
     
     conn.on('open', () => {
-        // Enviar lista actual de jugadores al nuevo jugador
         conn.send({
             type: 'players_update',
             players: roomPlayers
         });
+        
+        if (gameState.onlineMode === 'chat') {
+            conn.send({
+                type: 'chat_history',
+                messages: chatMessages
+            });
+        }
     });
     
     setupConnectionHandlers(conn);
@@ -302,18 +406,65 @@ function setupConnectionHandlers(conn) {
                 break;
                 
             case 'player_name_update':
-                roomPlayers[data.playerId].name = data.name;
-                updatePlayersList();
+                if (roomPlayers[data.playerId]) {
+                    roomPlayers[data.playerId].name = data.name;
+                    updatePlayersList();
+                }
                 break;
                 
             case 'start_game':
                 loadOnlineGame(data.gameData);
+                break;
+                
+            case 'chat_message':
+                receiveMessage(data.message);
+                break;
+                
+            case 'chat_history':
+                chatMessages = data.messages;
+                displayChatHistory();
+                break;
+                
+            case 'start_vote':
+                showVotingScreen();
+                break;
+                
+            case 'vote':
+                receiveVote(data.vote);
+                break;
+                
+            case 'reveal_results':
+                displayVoteResults(data.results);
+                break;
+                
+            case 'next_turn':
+                currentTurnIndex = data.turnIndex;
+                updateCurrentTurn(data.mode);
+                break;
+                
+            case 'turns_finished':
+                turnsFinished = true;
+                if (data.mode === 'oral') {
+                    turnSectionOral.classList.add('hidden');
+                    discussionSectionOral.classList.remove('hidden');
+                } else {
+                    turnSectionChat.classList.add('hidden');
+                    discussionSectionChat.classList.remove('hidden');
+                }
                 break;
         }
     });
     
     conn.on('close', () => {
         connections = connections.filter(c => c !== conn);
+        // Marcar jugador como desconectado
+        Object.keys(roomPlayers).forEach(playerId => {
+            if (roomPlayers[playerId].peerId === conn.peer) {
+                delete roomPlayers[playerId];
+                updatePlayersList();
+                broadcastPlayerUpdate();
+            }
+        });
     });
 }
 
@@ -332,7 +483,6 @@ function updatePlayersList() {
 
 function broadcastPlayerUpdate() {
     if (!gameState.isHost) {
-        // Si no eres host, envía tu actualización al host
         if (connections[0]) {
             connections[0].send({
                 type: 'player_name_update',
@@ -341,7 +491,6 @@ function broadcastPlayerUpdate() {
             });
         }
     } else {
-        // Si eres host, actualiza tu nombre y envía a todos
         roomPlayers[gameState.playerId].name = gameState.playerName;
         connections.forEach(conn => {
             conn.send({
@@ -369,7 +518,6 @@ function startOnlineGame() {
         return;
     }
     
-    // Generate game data
     const theme = themeLobby.value;
     const words = [...wordDatabase[theme]];
     const civilianWord = words.splice(Math.floor(Math.random() * words.length), 1)[0];
@@ -379,12 +527,10 @@ function startOnlineGame() {
     const playerWords = {};
     const impostorIndices = [];
     
-    // Assign civilian word to all
     playerIds.forEach(id => {
         playerWords[id] = civilianWord;
     });
     
-    // Assign impostor word
     while (impostorIndices.length < impostorCount) {
         const randomIndex = Math.floor(Math.random() * playerIds.length);
         if (!impostorIndices.includes(randomIndex)) {
@@ -399,10 +545,10 @@ function startOnlineGame() {
         impostorWord,
         playerWords,
         impostorIndices,
-        players: roomPlayers
+        players: roomPlayers,
+        mode: gameState.onlineMode
     };
     
-    // Enviar a todos los jugadores
     connections.forEach(conn => {
         conn.send({
             type: 'start_game',
@@ -410,31 +556,226 @@ function startOnlineGame() {
         });
     });
     
-    // Cargar para el host
     loadOnlineGame(gameData);
 }
 
 function loadOnlineGame(gameData) {
     lobbyScreen.classList.add('hidden');
-    onlineGameScreen.classList.remove('hidden');
     
     const myWord = gameData.playerWords[gameState.playerId];
     const isImpostor = myWord === "IMPOSTOR";
     
-    onlinePlayerName.textContent = gameState.playerName || 'Jugador';
-    wordDisplayOnline.textContent = myWord;
-    wordDisplayOnline.dataset.word = myWord; // Guardar palabra original
-    wordDisplayOnline.style.color = isImpostor ? '#ef4444' : '#10b981';
-    wordDisplayOnline.style.opacity = '1';
-    wordVisible = true;
+    // Inicializar orden de turnos
+    playerOrder = Object.keys(gameData.players);
+    currentTurnIndex = 0;
+    turnsFinished = false;
     
-    readyStatus.innerHTML = `
-        <p>Todos los jugadores han recibido sus palabras</p>
-        <p><strong>Toca la pantalla para ocultar/mostrar tu palabra</strong></p>
-        <p>Discutan y descubran quién es el impostor</p>
+    if (gameData.mode === 'oral') {
+        onlineGameScreen.classList.remove('hidden');
+        onlinePlayerName.textContent = gameState.playerName || 'Jugador';
+        wordDisplayOnline.textContent = myWord;
+        wordDisplayOnline.dataset.word = myWord;
+        wordDisplayOnline.style.color = isImpostor ? '#ef4444' : '#10b981';
+        wordDisplayOnline.style.opacity = '1';
+        wordVisible = true;
+        
+        // Mostrar primer turno
+        turnSectionOral.classList.remove('hidden');
+        discussionSectionOral.classList.add('hidden');
+        updateCurrentTurn('oral');
+        
+        backToLobbyBtn.classList.remove('hidden');
+    } else {
+        chatGameScreen.classList.remove('hidden');
+        chatPlayerName.textContent = gameState.playerName || 'Jugador';
+        wordDisplayChat.textContent = myWord;
+        wordDisplayChat.dataset.word = myWord;
+        wordDisplayChat.style.color = isImpostor ? '#ef4444' : '#10b981';
+        wordDisplayChat.style.opacity = '1';
+        wordVisibleChat = true;
+        
+        // Mostrar primer turno
+        turnSectionChat.classList.remove('hidden');
+        discussionSectionChat.classList.add('hidden');
+        updateCurrentTurn('chat');
+    }
+}
+
+function updateCurrentTurn(mode) {
+    const currentPlayerId = playerOrder[currentTurnIndex];
+    const currentPlayer = roomPlayers[currentPlayerId];
+    
+    if (mode === 'oral') {
+        currentTurnOral.textContent = currentPlayer.name;
+    } else {
+        currentTurnChat.textContent = currentPlayer.name;
+    }
+}
+
+function nextTurn(mode) {
+    currentTurnIndex++;
+    
+    if (currentTurnIndex >= playerOrder.length) {
+        // Terminar turnos, iniciar discusión
+        turnsFinished = true;
+        
+        if (mode === 'oral') {
+            turnSectionOral.classList.add('hidden');
+            discussionSectionOral.classList.remove('hidden');
+        } else {
+            turnSectionChat.classList.add('hidden');
+            discussionSectionChat.classList.remove('hidden');
+        }
+        
+        // Broadcast a todos
+        connections.forEach(conn => {
+            conn.send({
+                type: 'turns_finished',
+                mode: mode
+            });
+        });
+    } else {
+        updateCurrentTurn(mode);
+        
+        // Broadcast nuevo turno
+        connections.forEach(conn => {
+            conn.send({
+                type: 'next_turn',
+                turnIndex: currentTurnIndex,
+                mode: mode
+            });
+        });
+    }
+}
+
+function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    const msgData = {
+        sender: gameState.playerName,
+        senderId: gameState.playerId,
+        text: message,
+        timestamp: Date.now()
+    };
+    
+    chatMessages.push(msgData);
+    displayMessage(msgData, true);
+    
+    connections.forEach(conn => {
+        conn.send({
+            type: 'chat_message',
+            message: msgData
+        });
+    });
+    
+    chatInput.value = '';
+}
+
+function receiveMessage(msgData) {
+    chatMessages.push(msgData);
+    displayMessage(msgData, false);
+}
+
+function displayMessage(msgData, isOwn) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message ${isOwn ? 'own' : ''}`;
+    msgDiv.innerHTML = `
+        <div class="sender">${msgData.sender}</div>
+        <div class="text">${msgData.text}</div>
     `;
+    chatMessagesDiv.appendChild(msgDiv);
+    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+}
+
+function displayChatHistory() {
+    chatMessagesDiv.innerHTML = '';
+    chatMessages.forEach(msg => {
+        displayMessage(msg, msg.senderId === gameState.playerId);
+    });
+}
+
+function startVoting() {
+    if (!gameState.isHost) return;
     
-    backToLobbyBtn.classList.remove('hidden');
+    connections.forEach(conn => {
+        conn.send({ type: 'start_vote' });
+    });
+    
+    showVotingScreen();
+}
+
+function showVotingScreen() {
+    chatGameScreen.classList.add('hidden');
+    votingScreen.classList.remove('hidden');
+    
+    votingOptions.innerHTML = '';
+    Object.values(roomPlayers).forEach(player => {
+        const option = document.createElement('div');
+        option.className = 'vote-card';
+        option.textContent = player.name;
+        option.dataset.playerId = player.id;
+        option.onclick = () => castVote(player.id, option);
+        votingOptions.appendChild(option);
+    });
+}
+
+function castVote(playerId, element) {
+    if (element.classList.contains('voted')) return;
+    
+    element.classList.add('voted');
+    element.textContent += ' ✓';
+    
+    connections.forEach(conn => {
+        conn.send({
+            type: 'vote',
+            vote: { voterId: gameState.playerId, votedId: playerId }
+        });
+    });
+    
+    revealResultsBtn.classList.remove('hidden');
+}
+
+function receiveVote(vote) {
+    if (!gameState.votes) gameState.votes = {};
+    if (!gameState.votes[vote.votedId]) gameState.votes[vote.votedId] = 0;
+    gameState.votes[vote.votedId]++;
+}
+
+function revealVoteResults() {
+    if (!gameState.isHost) return;
+    
+    const results = {
+        votes: gameState.votes,
+        impostors: [] // Aquí deberías tener los IDs de los impostores
+    };
+    
+    connections.forEach(conn => {
+        conn.send({
+            type: 'reveal_results',
+            results: results
+        });
+    });
+    
+    displayVoteResults(results);
+}
+
+function displayVoteResults(results) {
+    voteResults.classList.remove('hidden');
+    voteResults.innerHTML = '<h3>Resultados:</h3>';
+    
+    Object.entries(results.votes).forEach(([playerId, votes]) => {
+        const player = roomPlayers[playerId];
+        const isImpostor = results.impostors.includes(playerId);
+        
+        const voteDiv = document.createElement('div');
+        voteDiv.className = `vote-item ${isImpostor ? 'impostor' : ''}`;
+        voteDiv.innerHTML = `
+            <span>${player.name} ${isImpostor ? '(IMPOSTOR)' : ''}</span>
+            <span>${votes} votos</span>
+        `;
+        voteResults.appendChild(voteDiv);
+    });
 }
 
 function leaveRoom() {
@@ -446,9 +787,12 @@ function leaveRoom() {
     connections.forEach(conn => conn.close());
     connections = [];
     roomPlayers = {};
+    chatMessages = [];
     
     lobbyScreen.classList.add('hidden');
     onlineGameScreen.classList.add('hidden');
+    chatGameScreen.classList.add('hidden');
+    votingScreen.classList.add('hidden');
     modeScreen.classList.remove('hidden');
     
     gameState.roomCode = '';
@@ -528,7 +872,6 @@ function revealWord(e) {
     if (gameState.currentPlayer < gameState.players) {
         nextPlayerButton.classList.remove('hidden');
     } else {
-        // Ya no hay votación, solo mostrar botón de jugar de nuevo
         playAgainButton.classList.remove('hidden');
     }
 }
@@ -553,9 +896,11 @@ function resetGame() {
     connections.forEach(conn => conn.close());
     connections = [];
     roomPlayers = {};
+    chatMessages = [];
     
     gameState = {
         mode: 'local',
+        onlineMode: 'oral',
         theme: '',
         players: 0,
         impostors: 0,
@@ -574,13 +919,16 @@ function resetGame() {
     
     gameScreen.classList.add('hidden');
     onlineGameScreen.classList.add('hidden');
+    chatGameScreen.classList.add('hidden');
+    votingScreen.classList.add('hidden');
     lobbyScreen.classList.add('hidden');
     setupScreen.classList.add('hidden');
     onlineRoomScreen.classList.add('hidden');
+    onlineModeScreen.classList.add('hidden');
     modeScreen.classList.remove('hidden');
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Juego del Impostor con PeerJS cargado');
+    console.log('Juego del Impostor con PeerJS cargado - Versión mejorada');
 });

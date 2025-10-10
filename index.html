@@ -26,9 +26,28 @@
             </div>
         </div>
 
+        <!-- Online Mode Selection -->
+        <div id="online-mode-screen" class="screen hidden">
+            <h1>Modo Online</h1>
+            <p class="instruction">Selecciona el tipo de juego</p>
+            <div class="mode-buttons">
+                <button id="oral-mode-btn" class="mode-btn">
+                    <span class="mode-icon">🎤</span>
+                    <span class="mode-title">Modo Oral</span>
+                    <span class="mode-desc">Con turnos + discusión por voz</span>
+                </button>
+                <button id="chat-mode-btn" class="mode-btn">
+                    <span class="mode-icon">💬</span>
+                    <span class="mode-title">Modo Chat</span>
+                    <span class="mode-desc">Con turnos + chat y votación</span>
+                </button>
+            </div>
+            <button id="back-from-online-mode" class="btn btn-secondary">Volver</button>
+        </div>
+
         <!-- Online Room Screen -->
         <div id="online-room-screen" class="screen hidden">
-            <h1>Modo Online</h1>
+            <h1 id="online-room-title">Modo Online</h1>
             <div class="online-options">
                 <button id="create-room-btn" class="btn">Crear Sala</button>
                 <div class="divider">O</div>
@@ -38,7 +57,7 @@
                 </div>
                 <button id="join-room-btn" class="btn">Unirse a Sala</button>
             </div>
-            <button id="back-to-mode" class="btn btn-secondary">Volver</button>
+            <button id="back-to-online-mode" class="btn btn-secondary">Volver</button>
         </div>
 
         <!-- Room Lobby Screen -->
@@ -109,14 +128,67 @@
             <button id="play-again" class="btn hidden">Jugar de Nuevo</button>
         </div>
 
-        <!-- Online Game Screen -->
+        <!-- Online Game Screen (Oral Mode) -->
         <div id="online-game-screen" class="screen hidden">
             <h2 id="online-player-name">Esperando...</h2>
             <p class="instruction">Tu palabra es:</p>
             <div class="word-display-online" id="word-display-online">Cargando...</div>
-            <p class="reveal-instruction">Memoriza tu palabra y espera a que todos estén listos</p>
-            <div id="ready-status" class="ready-status"></div>
-            <button id="back-to-lobby" class="btn btn-secondary hidden">Volver al Lobby</button>
+            <button id="toggle-word-btn" class="btn btn-small">👁️ Ocultar Palabra</button>
+            
+            <div class="turn-section" id="turn-section-oral">
+                <h3>🎤 Fase de Turnos</h3>
+                <div class="current-turn-display">
+                    <p>Turno de: <strong id="current-turn-oral">Esperando...</strong></p>
+                </div>
+                <button id="next-turn-oral-btn" class="btn">Siguiente Turno</button>
+            </div>
+            
+            <div class="discussion-section hidden" id="discussion-section-oral">
+                <h3>💬 Discusión Libre</h3>
+                <p>Todos pueden hablar libremente ahora</p>
+            </div>
+            
+            <button id="back-to-lobby" class="btn btn-secondary">Volver al Lobby</button>
+        </div>
+
+        <!-- Online Game Screen (Chat Mode) -->
+        <div id="chat-game-screen" class="screen hidden">
+            <h2 id="chat-player-name">Esperando...</h2>
+            <p class="instruction">Tu palabra es:</p>
+            <div class="word-display-online" id="word-display-chat">Cargando...</div>
+            <button id="toggle-word-chat-btn" class="btn btn-small">👁️ Ocultar Palabra</button>
+            
+            <div class="turn-section" id="turn-section-chat">
+                <h3>💬 Fase de Turnos</h3>
+                <div class="current-turn-display">
+                    <p>Turno de: <strong id="current-turn-chat">Esperando...</strong></p>
+                </div>
+                <button id="next-turn-chat-btn" class="btn">Siguiente Turno</button>
+            </div>
+            
+            <div class="discussion-section hidden" id="discussion-section-chat">
+                <h3>💬 Discusión Libre</h3>
+                <div class="chat-container">
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje...">
+                        <button id="send-message-btn" class="btn btn-small">Enviar</button>
+                    </div>
+                </div>
+                <button id="start-vote-btn" class="btn">Iniciar Votación</button>
+            </div>
+            
+            <button id="back-to-lobby-chat" class="btn btn-secondary">Volver al Lobby</button>
+        </div>
+
+        <!-- Voting Screen (Chat Mode) -->
+        <div id="voting-screen" class="screen hidden">
+            <h2>Votación</h2>
+            <p class="instruction">¿Quién creen que es el impostor?</p>
+            <div id="voting-options" class="cards-container"></div>
+            <div id="vote-results" class="vote-results hidden"></div>
+            <button id="reveal-results-btn" class="btn hidden">Revelar Resultados</button>
+            <button id="back-from-vote" class="btn btn-secondary">Volver</button>
         </div>
 
     </div>

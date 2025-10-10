@@ -596,3 +596,115 @@ h3 {
         grid-template-columns: 1fr 1fr;
     }
 }
+
+/* Chat Styles */
+.chat-container {
+    margin: 20px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.chat-messages {
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.chat-message {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    word-wrap: break-word;
+}
+
+.chat-message.own {
+    background: rgba(78, 205, 196, 0.3);
+    text-align: right;
+}
+
+.chat-message .sender {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    color: #4ecdc4;
+}
+
+.chat-message.own .sender {
+    color: #95e1d3;
+}
+
+.chat-message .text {
+    font-size: 1rem;
+}
+
+.chat-input-container {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-container input {
+    flex: 1;
+}
+
+/* Vote Results */
+.vote-results {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+}
+
+.vote-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    margin: 8px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.vote-item.winner {
+    background: rgba(78, 205, 196, 0.3);
+    border: 2px solid #4ecdc4;
+}
+
+.vote-item.impostor {
+    background: rgba(255, 107, 107, 0.3);
+    border: 2px solid #ff6b6b;
+}
+
+/* Turn System */
+.turn-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    border: 2px solid #667eea;
+}
+
+.current-turn-display {
+    font-size: 1.3rem;
+    text-align: center;
+    margin: 15px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.current-turn-display strong {
+    color: #4ecdc4;
+    font-size: 1.5rem;
+}
+
+.discussion-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(78, 205, 196, 0.2);
+    border-radius: 12px;
+    border: 2px solid #4ecdc4;
+}
