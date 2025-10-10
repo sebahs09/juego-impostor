@@ -335,6 +335,7 @@ function createRoom() {
         hostControls.classList.remove('hidden');
         
         updatePlayersList();
+        showLiveChat();
     });
     
     peer.on('connection', (conn) => {
@@ -395,6 +396,7 @@ function joinRoom() {
             hostControls.classList.add('hidden');
             
             setupConnectionHandlers(conn);
+            showLiveChat();
         });
         
         conn.on('error', (err) => {
@@ -469,6 +471,10 @@ function setupConnectionHandlers(conn) {
                 
             case 'reveal_results':
                 displayVoteResults(data.results);
+                break;
+                
+            case 'live_chat':
+                receiveLiveChatMessage(data.message);
                 break;
                 
             case 'next_turn':
@@ -961,6 +967,96 @@ function resetGame() {
     onlineModeScreen.classList.add('hidden');
     modeScreen.classList.remove('hidden');
 }
+
+// ========== LIVE CHAT FUNCTIONS ==========
+
+const liveChatWidget = document.getElementById('live-chat-widget');
+const liveChatMessages = document.getElementById('live-chat-messages');
+const liveChatInput = document.getElementById('live-chat-input');
+const sendLiveChatBtn = document.getElementById('send-live-chat-btn');
+const toggleChatBtn = document.getElementById('toggle-chat-btn');
+const closeChatBtn = document.getElementById('close-chat-btn');
+
+let liveChatHistory = [];
+let chatOpen = false;
+
+function showLiveChat() {
+    toggleChatBtn.classList.remove('hidden');
+}
+
+function toggleLiveChatWidget() {
+    chatOpen = !chatOpen;
+    if (chatOpen) {
+        liveChatWidget.classList.remove('hidden');
+        toggleChatBtn.style.display = 'none';
+        toggleChatBtn.classList.remove('has-unread');
+    } else {
+        liveChatWidget.classList.add('hidden');
+        toggleChatBtn.style.display = 'flex';
+    }
+}
+
+function sendLiveChatMessage() {
+    const message = liveChatInput.value.trim();
+    if (!message || !gameState.roomCode) return;
+    
+    const msgData = {
+        sender: gameState.playerName || 'Jugador',
+        senderId: gameState.playerId,
+        text: message,
+        timestamp: Date.now()
+    };
+    
+    liveChatHistory.push(msgData);
+    displayLiveChatMessage(msgData, true);
+    
+    // Broadcast a todos
+    connections.forEach(conn => {
+        conn.send({
+            type: 'live_chat',
+            message: msgData
+        });
+    });
+    
+    liveChatInput.value = '';
+}
+
+function receiveLiveChatMessage(msgData) {
+    liveChatHistory.push(msgData);
+    displayLiveChatMessage(msgData, false);
+    
+    // Si el chat está cerrado, mostrar notificación
+    if (!chatOpen) {
+        toggleChatBtn.classList.add('has-unread');
+    }
+}
+
+function displayLiveChatMessage(msgData, isOwn) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `live-chat-message ${isOwn ? 'own' : ''}`;
+    
+    const time = new Date(msgData.timestamp).toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    msgDiv.innerHTML = `
+        <div class="sender">${msgData.sender}</div>
+        <div class="text">${msgData.text}</div>
+        <div class="time">${time}</div>
+    `;
+    
+    liveChatMessages.appendChild(msgDiv);
+    liveChatMessages.scrollTop = liveChatMessages.scrollHeight;
+}
+
+// Event Listeners - Live Chat
+toggleChatBtn.addEventListener('click', toggleLiveChatWidget);
+closeChatBtn.addEventListener('click', toggleLiveChatWidget);
+sendLiveChatBtn.addEventListener('click', sendLiveChatMessage);
+liveChatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendLiveChatMessage();
+});
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {

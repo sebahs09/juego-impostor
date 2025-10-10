@@ -195,6 +195,24 @@
 
     <!-- Custom Toast Notifications -->
     <div id="toast-container"></div>
+
+    <!-- Live Chat Widget -->
+    <div id="live-chat-widget" class="chat-widget hidden">
+        <div class="chat-widget-header">
+            <span>💬 Chat en Vivo</span>
+            <button id="close-chat-btn" class="chat-close-btn">✕</button>
+        </div>
+        <div class="chat-widget-messages" id="live-chat-messages"></div>
+        <div class="chat-widget-input">
+            <input type="text" id="live-chat-input" placeholder="Escribe un mensaje..." maxlength="200">
+            <button id="send-live-chat-btn">➤</button>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button id="toggle-chat-btn" class="chat-toggle-btn hidden">
+        💬
+    </button>
     
     <!-- PeerJS - Conexión P2P gratuita -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
