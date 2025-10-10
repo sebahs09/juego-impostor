@@ -600,6 +600,10 @@ function startOnlineGame() {
 }
 
 function loadOnlineGame(gameData) {
+    console.log('=== LOAD ONLINE GAME ===');
+    console.log('Game Data:', gameData);
+    console.log('My Player ID:', gameState.playerId);
+    
     lobbyScreen.classList.add('hidden');
     
     const myWord = gameData.playerWords[gameState.playerId];
@@ -610,10 +614,15 @@ function loadOnlineGame(gameData) {
         roomPlayers = gameData.players;
     }
     
+    console.log('Room Players:', roomPlayers);
+    
     // Inicializar orden de turnos
     playerOrder = Object.keys(roomPlayers);
     currentTurnIndex = 0;
     turnsFinished = false;
+    
+    console.log('Player Order:', playerOrder);
+    console.log('First Player:', playerOrder[0]);
     
     if (gameData.mode === 'oral') {
         onlineGameScreen.classList.remove('hidden');
@@ -647,13 +656,21 @@ function loadOnlineGame(gameData) {
 }
 
 function updateCurrentTurn(mode) {
+    console.log('=== UPDATE CURRENT TURN ===');
+    console.log('Mode:', mode);
+    console.log('Player Order:', playerOrder);
+    console.log('Current Turn Index:', currentTurnIndex);
+    
     if (!playerOrder || playerOrder.length === 0 || !roomPlayers) {
         console.error('Player order or roomPlayers not initialized');
         return;
     }
     
     const currentPlayerId = playerOrder[currentTurnIndex];
+    console.log('Current Player ID:', currentPlayerId);
+    
     const currentPlayer = roomPlayers[currentPlayerId];
+    console.log('Current Player:', currentPlayer);
     
     if (!currentPlayer) {
         console.error('Current player not found:', currentPlayerId);
@@ -661,6 +678,8 @@ function updateCurrentTurn(mode) {
     }
     
     const isMyTurn = currentPlayerId === gameState.playerId;
+    console.log('Is My Turn?', isMyTurn);
+    console.log('My ID:', gameState.playerId);
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
