@@ -29,24 +29,17 @@ body::before {
     background: 
         radial-gradient(circle at 20% 80%, rgba(88, 86, 214, 0.15), transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(255, 71, 133, 0.15), transparent 50%);
-    animation: rotate 30s linear infinite;
     pointer-events: none;
-}
-
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    will-change: transform;
 }
 
 .container {
-    background: rgba(15, 15, 20, 0.7);
+    background: rgba(15, 15, 20, 0.95);
     border-radius: 24px;
     padding: 40px;
     width: 100%;
     max-width: 900px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     z-index: 1;
@@ -595,14 +588,13 @@ h3 {
 }
 
 .toast {
-    background: rgba(15, 15, 20, 0.95);
+    background: rgba(15, 15, 20, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     padding: 16px 20px;
     min-width: 300px;
     max-width: 400px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(20px);
     animation: slideIn 0.3s ease-out;
     display: flex;
     align-items: center;
@@ -676,11 +668,10 @@ h3 {
     right: 20px;
     width: 350px;
     height: 500px;
-    background: rgba(15, 15, 20, 0.95);
+    background: rgba(15, 15, 20, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(20px);
     display: flex;
     flex-direction: column;
     z-index: 9999;
@@ -848,17 +839,16 @@ h3 {
     transform: scale(1.1);
 }
 
-.chat-toggle-btn.has-unread {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 4px 16px rgba(88, 86, 214, 0.4);
-    }
-    50% {
-        box-shadow: 0 4px 24px rgba(88, 86, 214, 0.8);
-    }
+.chat-toggle-btn.has-unread::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 12px;
+    height: 12px;
+    background: #ff4785;
+    border-radius: 50%;
+    border: 2px solid #0a0a0f;
 }
 
 /* Responsive adjustments */

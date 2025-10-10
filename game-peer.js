@@ -600,10 +600,6 @@ function startOnlineGame() {
 }
 
 function loadOnlineGame(gameData) {
-    console.log('=== LOAD ONLINE GAME ===');
-    console.log('Game Data:', gameData);
-    console.log('My Player ID:', gameState.playerId);
-    
     lobbyScreen.classList.add('hidden');
     
     const myWord = gameData.playerWords[gameState.playerId];
@@ -614,15 +610,10 @@ function loadOnlineGame(gameData) {
         roomPlayers = gameData.players;
     }
     
-    console.log('Room Players:', roomPlayers);
-    
     // Inicializar orden de turnos
     playerOrder = Object.keys(roomPlayers);
     currentTurnIndex = 0;
     turnsFinished = false;
-    
-    console.log('Player Order:', playerOrder);
-    console.log('First Player:', playerOrder[0]);
     
     if (gameData.mode === 'oral') {
         onlineGameScreen.classList.remove('hidden');
@@ -656,52 +647,21 @@ function loadOnlineGame(gameData) {
 }
 
 function updateCurrentTurn(mode) {
-    console.log('=== UPDATE CURRENT TURN ===');
-    console.log('Mode:', mode);
-    console.log('Player Order:', playerOrder);
-    console.log('Current Turn Index:', currentTurnIndex);
-    
-    if (!playerOrder || playerOrder.length === 0 || !roomPlayers) {
-        console.error('Player order or roomPlayers not initialized');
-        return;
-    }
+    if (!playerOrder || playerOrder.length === 0 || !roomPlayers) return;
     
     const currentPlayerId = playerOrder[currentTurnIndex];
-    console.log('Current Player ID:', currentPlayerId);
-    
     const currentPlayer = roomPlayers[currentPlayerId];
-    console.log('Current Player:', currentPlayer);
     
-    if (!currentPlayer) {
-        console.error('Current player not found:', currentPlayerId);
-        return;
-    }
+    if (!currentPlayer) return;
     
     const isMyTurn = currentPlayerId === gameState.playerId;
-    console.log('Is My Turn?', isMyTurn);
-    console.log('My ID:', gameState.playerId);
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
-        if (isMyTurn) {
-            console.log('Showing ORAL button');
-            console.log('Button element:', nextTurnOralBtn);
-            nextTurnOralBtn.classList.remove('hidden');
-            console.log('Button classes after:', nextTurnOralBtn.className);
-        } else {
-            nextTurnOralBtn.classList.add('hidden');
-        }
+        nextTurnOralBtn.classList.toggle('hidden', !isMyTurn);
     } else {
         currentTurnChat.textContent = currentPlayer.name;
-        if (isMyTurn) {
-            console.log('Showing CHAT button');
-            console.log('Button element:', nextTurnChatBtn);
-            nextTurnChatBtn.classList.remove('hidden');
-            console.log('Button classes after:', nextTurnChatBtn.className);
-            console.log('Button style display:', nextTurnChatBtn.style.display);
-        } else {
-            nextTurnChatBtn.classList.add('hidden');
-        }
+        nextTurnChatBtn.classList.toggle('hidden', !isMyTurn);
     }
 }
 
