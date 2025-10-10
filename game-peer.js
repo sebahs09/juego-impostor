@@ -605,14 +605,15 @@ function loadOnlineGame(gameData) {
     const myWord = gameData.playerWords[gameState.playerId];
     const isImpostor = myWord === "IMPOSTOR";
     
+    // Actualizar roomPlayers con los datos del juego
+    if (gameData.players) {
+        roomPlayers = gameData.players;
+    }
+    
     // Inicializar orden de turnos
-    playerOrder = Object.keys(gameData.players);
+    playerOrder = Object.keys(roomPlayers);
     currentTurnIndex = 0;
     turnsFinished = false;
-    
-    console.log('Player Order:', playerOrder);
-    console.log('My Player ID:', gameState.playerId);
-    console.log('Current Turn Index:', currentTurnIndex);
     
     if (gameData.mode === 'oral') {
         onlineGameScreen.classList.remove('hidden');
@@ -646,35 +647,34 @@ function loadOnlineGame(gameData) {
 }
 
 function updateCurrentTurn(mode) {
+    if (!playerOrder || playerOrder.length === 0 || !roomPlayers) {
+        console.error('Player order or roomPlayers not initialized');
+        return;
+    }
+    
     const currentPlayerId = playerOrder[currentTurnIndex];
     const currentPlayer = roomPlayers[currentPlayerId];
-    const isMyTurn = currentPlayerId === gameState.playerId;
     
-    console.log('Update Turn - Current Player ID:', currentPlayerId);
-    console.log('Update Turn - My Player ID:', gameState.playerId);
-    console.log('Update Turn - Is My Turn:', isMyTurn);
+    if (!currentPlayer) {
+        console.error('Current player not found:', currentPlayerId);
+        return;
+    }
+    
+    const isMyTurn = currentPlayerId === gameState.playerId;
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
-        // Mostrar/ocultar botón según si es tu turno
         if (isMyTurn) {
             nextTurnOralBtn.classList.remove('hidden');
-            nextTurnOralBtn.textContent = 'Pasar Turno';
-            console.log('Showing button for oral mode');
         } else {
             nextTurnOralBtn.classList.add('hidden');
-            console.log('Hiding button for oral mode');
         }
     } else {
         currentTurnChat.textContent = currentPlayer.name;
-        // Mostrar/ocultar botón según si es tu turno
         if (isMyTurn) {
             nextTurnChatBtn.classList.remove('hidden');
-            nextTurnChatBtn.textContent = 'Pasar Turno';
-            console.log('Showing button for chat mode');
         } else {
             nextTurnChatBtn.classList.add('hidden');
-            console.log('Hiding button for chat mode');
         }
     }
 }
