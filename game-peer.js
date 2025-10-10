@@ -644,15 +644,37 @@ function loadOnlineGame(gameData) {
 function updateCurrentTurn(mode) {
     const currentPlayerId = playerOrder[currentTurnIndex];
     const currentPlayer = roomPlayers[currentPlayerId];
+    const isMyTurn = currentPlayerId === gameState.playerId;
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
+        // Mostrar/ocultar botón según si es tu turno
+        if (isMyTurn) {
+            nextTurnOralBtn.classList.remove('hidden');
+            nextTurnOralBtn.textContent = 'Pasar Turno';
+        } else {
+            nextTurnOralBtn.classList.add('hidden');
+        }
     } else {
         currentTurnChat.textContent = currentPlayer.name;
+        // Mostrar/ocultar botón según si es tu turno
+        if (isMyTurn) {
+            nextTurnChatBtn.classList.remove('hidden');
+            nextTurnChatBtn.textContent = 'Pasar Turno';
+        } else {
+            nextTurnChatBtn.classList.add('hidden');
+        }
     }
 }
 
 function nextTurn(mode) {
+    // Verificar que sea el turno del jugador actual
+    const currentPlayerId = playerOrder[currentTurnIndex];
+    if (currentPlayerId !== gameState.playerId) {
+        showToast('No es tu turno', 'error', 'Espera tu turno');
+        return;
+    }
+    
     currentTurnIndex++;
     
     if (currentTurnIndex >= playerOrder.length) {
