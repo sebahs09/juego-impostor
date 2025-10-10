@@ -683,36 +683,20 @@ function updateCurrentTurn(mode) {
     
     if (!currentPlayer) return;
     
-    const isMyTurn = currentPlayerId === gameState.playerId;
     const isLastTurn = currentTurnIndex === playerOrder.length - 1;
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
-        if (isMyTurn) {
-            nextTurnOralBtn.classList.remove('hidden');
-            nextTurnOralBtn.textContent = isLastTurn ? 'Iniciar Discusión' : 'Pasar Turno';
-        } else {
-            nextTurnOralBtn.classList.add('hidden');
-        }
+        nextTurnOralBtn.classList.remove('hidden');
+        nextTurnOralBtn.textContent = isLastTurn ? 'Iniciar Discusión' : 'Pasar Turno';
     } else {
         currentTurnChat.textContent = currentPlayer.name;
-        if (isMyTurn) {
-            nextTurnChatBtn.classList.remove('hidden');
-            nextTurnChatBtn.textContent = isLastTurn ? 'Iniciar Votación' : 'Pasar Turno';
-        } else {
-            nextTurnChatBtn.classList.add('hidden');
-        }
+        nextTurnChatBtn.classList.remove('hidden');
+        nextTurnChatBtn.textContent = isLastTurn ? 'Iniciar Votación' : 'Pasar Turno';
     }
 }
 
 function nextTurn(mode) {
-    // Verificar que sea el turno del jugador actual
-    const currentPlayerId = playerOrder[currentTurnIndex];
-    if (currentPlayerId !== gameState.playerId) {
-        showToast('No es tu turno', 'error', 'Espera tu turno');
-        return;
-    }
-    
     currentTurnIndex++;
     
     if (currentTurnIndex >= playerOrder.length) {
