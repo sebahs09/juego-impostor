@@ -328,6 +328,10 @@ backFromVoteBtn.addEventListener('click', () => {
 function createRoom() {
     const roomCode = generateRoomCode();
     
+    // Mostrar indicador de carga
+    createRoomBtn.disabled = true;
+    createRoomBtn.textContent = 'Creando sala...';
+    
     peer = new Peer(roomCode, {
         config: {
             iceServers: [
@@ -338,6 +342,8 @@ function createRoom() {
     });
     
     peer.on('open', (id) => {
+        createRoomBtn.disabled = false;
+        createRoomBtn.textContent = 'Crear Sala';
         gameState.roomCode = id;
         gameState.playerId = 'host';
         gameState.isHost = true;
@@ -368,6 +374,8 @@ function createRoom() {
     
     peer.on('error', (err) => {
         console.error('Error de PeerJS:', err);
+        createRoomBtn.disabled = false;
+        createRoomBtn.textContent = 'Crear Sala';
         showToast('No se pudo crear la sala. Intenta de nuevo.', 'error', 'Error de Conexión');
     });
 }
@@ -379,6 +387,10 @@ function joinRoom() {
         showToast('Por favor ingresa un código de sala válido', 'error', 'Código Requerido');
         return;
     }
+    
+    // Mostrar indicador de carga
+    joinRoomBtn.disabled = true;
+    joinRoomBtn.textContent = 'Conectando...';
     
     const playerId = generatePlayerId();
     
@@ -392,6 +404,7 @@ function joinRoom() {
     });
     
     peer.on('open', () => {
+        joinRoomBtn.textContent = 'Uniéndose...';
         const conn = peer.connect(roomCode);
         
         conn.on('open', () => {
@@ -420,13 +433,24 @@ function joinRoom() {
             playerNameLobby.value = gameState.playerName;
             hostControls.classList.add('hidden');
             
+            joinRoomBtn.disabled = false;
+            joinRoomBtn.textContent = 'Unirse a Sala';
+            
             setupConnectionHandlers(conn);
             showLiveChat();
         });
         
         conn.on('error', (err) => {
+            joinRoomBtn.disabled = false;
+            joinRoomBtn.textContent = 'Unirse a Sala';
             showToast('No se pudo conectar. Verifica el código de sala.', 'error', 'Error de Conexión');
         });
+    });
+    
+    peer.on('error', (err) => {
+        joinRoomBtn.disabled = false;
+        joinRoomBtn.textContent = 'Unirse a Sala';
+        showToast('Error de conexión. Intenta de nuevo.', 'error', 'Error');
     });
 }
 
