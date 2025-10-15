@@ -41,10 +41,31 @@ const wordDatabase = {
         "Redstone", "Obsidiana", "Portal", "Elytra"
     ],
     futbol: [
-        "Messi", "Cristiano Ronaldo", "Neymar", "Mbappé", 
-        "Haaland", "Lewandowski", "De Bruyne", "Benzema", 
-        "Modric", "Vinicius Jr", "Salah", "Kane",
-        "Pelé", "Maradona", "Zidane", "Ronaldinho"
+        "Lionel Messi", "Cristiano Ronaldo", "Kylian Mbappé", "Erling Haaland",
+        "Neymar Jr", "Luka Modrić", "Robert Lewandowski", "Kevin De Bruyne",
+        "Vinícius Jr", "Mohamed Salah", "Harry Kane", "Jude Bellingham",
+        "Antoine Griezmann", "Bruno Fernandes", "Phil Foden", "Bukayo Saka",
+        "Pedri", "Gavi", "Rodri", "Toni Kroos", "Karim Benzema", "Marcus Rashford",
+        "Frenkie de Jong", "João Félix", "Rafael Leão", "Son Heung-min",
+        "Casemiro", "Bernardo Silva", "Jack Grealish", "Ousmane Dembélé",
+        "Achraf Hakimi", "Theo Hernández", "Marc-André ter Stegen", "Thibaut Courtois",
+        "Emiliano Martínez", "Alisson Becker", "Ederson Moraes", "Mike Maignan",
+        "Jamal Musiala", "Joshua Kimmich", "Ilkay Gündogan", "Martin Ødegaard",
+        "Virgil van Dijk", "Rúben Dias", "Lisandro Martínez", "Julián Álvarez",
+        "Enzo Fernández", "Lautaro Martínez", "Ángel Di María", "Paulo Dybala",
+        "Federico Valverde", "Eduardo Camavinga", "Aurélien Tchouaméni", "Declan Rice",
+        "Kai Havertz", "Christopher Nkunku", "Rasmus Højlund", "Darwin Núñez",
+        "Alejandro Garnacho", "Nicolás Otamendi", "Sergio Ramos", "Gerard Piqué",
+        "Jordi Alba", "Daniel Carvajal", "Kyle Walker", "John Stones",
+        "Antonio Rüdiger", "Eder Militão", "Dayot Upamecano", "Matthijs de Ligt",
+        "Ronald Araújo", "Marquinhos", "Thiago Silva", "Raphaël Varane",
+        "João Cancelo", "Andrew Robertson", "Trent Alexander-Arnold", "Jérémy Doku",
+        "Takefusa Kubo", "Nico Williams", "Ansu Fati", "Mason Mount",
+        "Raheem Sterling", "Richarlison", "Gabriel Jesus", "Rodrygo",
+        "Alexis Sánchez", "James Rodríguez", "Luis Díaz", "Wojciech Szczęsny",
+        "Dominik Szoboszlai", "Nicolo Barella", "Federico Chiesa", "Leon Goretzka",
+        "Serge Gnabry", "Kingsley Coman", "Álvaro Morata", "Memphis Depay",
+        "Gerard Moreno", "Granit Xhaka", "Christian Pulisic"
     ],
     comida: [
         "Pizza", "Hamburguesa", "Sushi", "Tacos", 
@@ -53,10 +74,20 @@ const wordDatabase = {
         "Hot Dog", "Burrito", "Lasaña", "Croissant"
     ],
     clashroyale: [
-        "Megacaballero", "P.E.K.K.A", "Mago Eléctrico", "Princesa", 
-        "Montapuercos", "Golem", "Minero", "Leñador", 
-        "Bandida", "Bruja", "Dragón Infernal", "Gigante",
-        "Caballero", "Valquiria", "Globo", "Tornado"
+        "Caballero", "Arqueras", "Esqueletos", "Bárbaros", "Gólem", "Mini P.E.K.K.A",
+        "Mosquetera", "Gigante", "Príncipe", "Bebé Dragón", "Bruja", "Valquiria",
+        "Globo Bombástico", "Ejército de esqueletos", "Mago", "Horda de esbirros",
+        "Duendes", "Duendes con lanza", "Montapuercos", "Torre infernal", "P.E.K.K.A",
+        "Mago de hielo", "Mago eléctrico", "Chispitas", "Dragón eléctrico", "Leñador",
+        "Megaesbirro", "Megacaballero", "Minero", "Príncipe oscuro", "Bandida",
+        "Fantasma real", "Bruja nocturna", "Cazador", "Pescador", "Arquero mágico",
+        "Esqueleto gigante", "Dragón infernal", "Gigante noble", "Gigante eléctrico",
+        "Duende gigante", "Curandera guerrera", "Caballero dorado", "Reina arquera",
+        "Guardias", "Reclutas reales", "Bárbaros de élite", "Puercos reales",
+        "Duendes reales", "Rey esqueleto", "Murciélagos", "Esbirros", "Dragones esqueleto",
+        "Espíritu de hielo", "Espíritu de fuego", "Espíritu eléctrico", "Espíritu sanador",
+        "Bombardero", "Lanzarrocas", "Verdugo", "Lanzadardos", "Trío de mosqueteras",
+        "Máquina voladora", "Gólem de hielo", "Gólem de elixir", "Guardabosques"
     ]
 };
 
