@@ -130,10 +130,8 @@ let chatMessages = [];
 let currentTurnIndex = 0;
 let playerOrder = [];
 let turnsFinished = false;
-let roomScore = {
-    impostors: 0,
-    crew: 0
-};
+let playerScores = {}; // { playerId: points }
+let currentImpostors = []; // IDs de los impostores actuales
 
 // DOM Elements - Name Screen
 const nameScreen = document.getElementById('name-screen');
@@ -188,8 +186,7 @@ const hostControls = document.getElementById('host-controls');
 const themeLobby = document.getElementById('theme-lobby');
 const impostorsLobby = document.getElementById('impostors-lobby');
 const startOnlineGameBtn = document.getElementById('start-online-game');
-const impostorScoreEl = document.getElementById('impostor-score');
-const crewScoreEl = document.getElementById('crew-score');
+const scoreTableEl = document.getElementById('score-table');
 const leaveRoomBtn = document.getElementById('leave-room-btn');
 
 // DOM Elements - Local Setup
@@ -681,8 +678,13 @@ function setupConnectionHandlers(conn) {
                 break;
                 
             case 'update_score':
-                roomScore = data.score;
+                playerScores = data.scores;
                 updateScoreboard();
+                // Mostrar mensaje con nombres de impostores
+                const message = data.winner === 'impostor' 
+                    ? `🔴 El impostor era: ${data.impostorNames}` 
+                    : `🔵 La tripulación ganó! El impostor era: ${data.impostorNames}`;
+                showToast(message, 'success', 'Fin de Ronda');
                 break;
                 
             case 'back_to_lobby':
@@ -712,13 +714,21 @@ function updatePlayersList() {
     playersList.innerHTML = '<h3>Jugadores en la sala:</h3>';
     Object.values(roomPlayers).forEach(player => {
         const playerDiv = document.createElement('div');
-        playerDiv.className = `player-item ${player.isHost ? 'host' : ''}`;
-        playerDiv.innerHTML = `
-            <span>${player.name}</span>
-            ${player.isHost ? '<span class="host-badge">ANFITRIÓN</span>' : ''}
-        `;
+        playerDiv.className = 'player-item';
+        if (player.isHost) {
+            playerDiv.classList.add('host');
+        }
+        playerDiv.textContent = `${player.name} ${player.isHost ? '👑' : ''}`;
         playersList.appendChild(playerDiv);
+        
+        // Inicializar puntos si no existen
+        if (!playerScores[player.id]) {
+            playerScores[player.id] = 0;
+        }
     });
+    
+    // Actualizar tabla de puntuaciones
+    updateScoreboard();
 }
 
 function broadcastPlayerUpdate() {
@@ -771,11 +781,15 @@ function startOnlineGame() {
         playerWords[id] = civilianWord;
     });
     
+    // Guardar IDs de impostores
+    currentImpostors = [];
     while (impostorIndices.length < impostorCount) {
         const randomIndex = Math.floor(Math.random() * playerIds.length);
         if (!impostorIndices.includes(randomIndex)) {
             impostorIndices.push(randomIndex);
-            playerWords[playerIds[randomIndex]] = impostorWord;
+            const impostorId = playerIds[randomIndex];
+            playerWords[impostorId] = impostorWord;
+            currentImpostors.push(impostorId);
         }
     }
     
@@ -790,7 +804,8 @@ function startOnlineGame() {
         impostorIndices,
         players: roomPlayers,
         mode: gameState.onlineMode,
-        turnOrder: shuffledPlayerIds // Orden aleatorio
+        turnOrder: shuffledPlayerIds, // Orden aleatorio
+        impostors: currentImpostors
     };
     
     connections.forEach(conn => {
@@ -805,6 +820,9 @@ function startOnlineGame() {
 
 function loadOnlineGame(gameData) {
     lobbyScreen.classList.add('hidden');
+    
+    // Guardar impostores actuales
+    currentImpostors = gameData.impostors || [];
     
     const myWord = gameData.playerWords[gameState.playerId];
     const isImpostor = myWord === "IMPOSTOR";
@@ -974,11 +992,17 @@ function displayChatHistory() {
 }
 
 function declareWinner(winner, mode) {
-    // Actualizar marcador
+    // Obtener nombres de impostores
+    const impostorNames = currentImpostors.map(id => roomPlayers[id]?.name || 'Desconocido').join(', ');
+    
+    // Actualizar puntos solo si ganaron los impostores
     if (winner === 'impostor') {
-        roomScore.impostors++;
-    } else {
-        roomScore.crew++;
+        currentImpostors.forEach(impostorId => {
+            if (!playerScores[impostorId]) {
+                playerScores[impostorId] = 0;
+            }
+            playerScores[impostorId]++;
+        });
     }
     
     updateScoreboard();
@@ -987,15 +1011,19 @@ function declareWinner(winner, mode) {
     connections.forEach(conn => {
         conn.send({
             type: 'update_score',
-            score: roomScore
+            scores: playerScores,
+            winner: winner,
+            impostorNames: impostorNames
         });
     });
     
-    // Mostrar mensaje
-    const winnerText = winner === 'impostor' ? '🔴 Impostores' : '🔵 Tripulación';
-    showToast(`${winnerText} ganó esta ronda!`, 'success', 'Victoria');
+    // Mostrar mensaje con nombres de impostores
+    const message = winner === 'impostor' 
+        ? `🔴 El impostor era: ${impostorNames}` 
+        : `🔵 La tripulación ganó! El impostor era: ${impostorNames}`;
+    showToast(message, 'success', 'Fin de Ronda');
     
-    // Volver al lobby después de 2 segundos
+    // Volver al lobby después de 3 segundos
     setTimeout(() => {
         if (mode === 'oral') {
             onlineGameScreen.classList.add('hidden');
@@ -1016,12 +1044,42 @@ function declareWinner(winner, mode) {
                 type: 'back_to_lobby'
             });
         });
-    }, 2000);
+    }, 3000);
 }
 
 function updateScoreboard() {
-    impostorScoreEl.textContent = roomScore.impostors;
-    crewScoreEl.textContent = roomScore.crew;
+    // Crear array de jugadores con puntos
+    const playersWithScores = Object.keys(roomPlayers).map(playerId => ({
+        id: playerId,
+        name: roomPlayers[playerId].name,
+        points: playerScores[playerId] || 0
+    }));
+    
+    // Ordenar por puntos (mayor a menor)
+    playersWithScores.sort((a, b) => b.points - a.points);
+    
+    // Renderizar tabla
+    scoreTableEl.innerHTML = '';
+    playersWithScores.forEach((player, index) => {
+        const row = document.createElement('div');
+        row.className = 'score-row';
+        if (index === 0 && player.points > 0) {
+            row.classList.add('top-player');
+        }
+        
+        const rank = index + 1;
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+        
+        row.innerHTML = `
+            <div class="player-name">
+                <span class="player-rank">${medal}</span>
+                <span>${player.name}</span>
+            </div>
+            <span class="player-points">${player.points} pts</span>
+        `;
+        
+        scoreTableEl.appendChild(row);
+    });
 }
 
 function startNewRound(mode) {
