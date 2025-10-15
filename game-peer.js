@@ -1005,6 +1005,27 @@ function declareWinner(winner, mode) {
         });
     }
     
+    // Mostrar mensaje con nombres de impostores
+    const message = winner === 'impostor' 
+        ? `🔴 El impostor era: ${impostorNames}` 
+        : `🔵 La tripulación ganó! El impostor era: ${impostorNames}`;
+    showToast(message, 'success', 'Fin de Ronda');
+    
+    // Volver al lobby inmediatamente
+    if (mode === 'oral') {
+        onlineGameScreen.classList.add('hidden');
+    } else {
+        chatGameScreen.classList.add('hidden');
+    }
+    lobbyScreen.classList.remove('hidden');
+    
+    // Resetear UI
+    victoryButtonsOral.classList.add('hidden');
+    victoryButtonsChat.classList.add('hidden');
+    nextRoundOralBtn.classList.add('hidden');
+    startVoteBtn.classList.add('hidden');
+    
+    // Actualizar tabla de puntuaciones
     updateScoreboard();
     
     // Broadcast a todos
@@ -1017,34 +1038,12 @@ function declareWinner(winner, mode) {
         });
     });
     
-    // Mostrar mensaje con nombres de impostores
-    const message = winner === 'impostor' 
-        ? `🔴 El impostor era: ${impostorNames}` 
-        : `🔵 La tripulación ganó! El impostor era: ${impostorNames}`;
-    showToast(message, 'success', 'Fin de Ronda');
-    
-    // Volver al lobby después de 3 segundos
-    setTimeout(() => {
-        if (mode === 'oral') {
-            onlineGameScreen.classList.add('hidden');
-        } else {
-            chatGameScreen.classList.add('hidden');
-        }
-        lobbyScreen.classList.remove('hidden');
-        
-        // Resetear UI
-        victoryButtonsOral.classList.add('hidden');
-        victoryButtonsChat.classList.add('hidden');
-        nextRoundOralBtn.classList.add('hidden');
-        startVoteBtn.classList.add('hidden');
-        
-        // Broadcast volver al lobby
-        connections.forEach(conn => {
-            conn.send({
-                type: 'back_to_lobby'
-            });
+    // Broadcast volver al lobby
+    connections.forEach(conn => {
+        conn.send({
+            type: 'back_to_lobby'
         });
-    }, 3000);
+    });
 }
 
 function updateScoreboard() {
@@ -1463,6 +1462,25 @@ closeChatBtn.addEventListener('click', toggleLiveChatWidget);
 sendLiveChatBtn.addEventListener('click', sendLiveChatMessage);
 liveChatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendLiveChatMessage();
+});
+
+// Detectar cuando el usuario cierra la página o recarga (F5)
+window.addEventListener('beforeunload', (e) => {
+    if (gameState.roomCode && peer) {
+        // Notificar a otros jugadores que nos vamos
+        if (gameState.isHost) {
+            connections.forEach(conn => {
+                conn.send({
+                    type: 'host_disconnect'
+                });
+            });
+        }
+        
+        // Cerrar conexión
+        if (peer) {
+            peer.destroy();
+        }
+    }
 });
 
 // Initialize
