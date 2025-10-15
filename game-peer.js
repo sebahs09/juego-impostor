@@ -412,7 +412,7 @@ function createRoom() {
 }
 
 function joinRoom() {
-    const roomCode = roomCodeInput.value.trim().toUpperCase();
+    const roomCode = roomCodeInput.value.trim().toLowerCase();
     
     if (!roomCode) {
         showToast('Por favor ingresa un código de sala válido', 'error', 'Código Requerido');
@@ -948,7 +948,7 @@ function leaveRoom() {
 }
 
 function generateRoomCode() {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
+    return Math.random().toString(36).substring(2, 8).toLowerCase();
 }
 
 function generatePlayerId() {
