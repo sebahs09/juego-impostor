@@ -851,6 +851,65 @@ h3 {
     border: 2px solid #0a0a0f;
 }
 
+/* Scoreboard */
+.scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.score-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Victory Buttons */
+.victory-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.btn-impostor {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: 2px solid #b91c1c;
+}
+
+.btn-impostor:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+}
+
+.btn-crew {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: 2px solid #1d4ed8;
+}
+
+.btn-crew:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+}
+
 /* Footer */
 .footer {
     position: fixed;

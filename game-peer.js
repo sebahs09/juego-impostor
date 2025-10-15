@@ -74,20 +74,31 @@ const wordDatabase = {
         "Hot Dog", "Burrito", "Lasaña", "Croissant"
     ],
     clashroyale: [
+        // Tropas
         "Caballero", "Arqueras", "Esqueletos", "Bárbaros", "Gólem", "Mini P.E.K.K.A",
         "Mosquetera", "Gigante", "Príncipe", "Bebé Dragón", "Bruja", "Valquiria",
-        "Globo Bombástico", "Ejército de esqueletos", "Mago", "Horda de esbirros",
-        "Duendes", "Duendes con lanza", "Montapuercos", "Torre infernal", "P.E.K.K.A",
-        "Mago de hielo", "Mago eléctrico", "Chispitas", "Dragón eléctrico", "Leñador",
-        "Megaesbirro", "Megacaballero", "Minero", "Príncipe oscuro", "Bandida",
-        "Fantasma real", "Bruja nocturna", "Cazador", "Pescador", "Arquero mágico",
-        "Esqueleto gigante", "Dragón infernal", "Gigante noble", "Gigante eléctrico",
-        "Duende gigante", "Curandera guerrera", "Caballero dorado", "Reina arquera",
-        "Guardias", "Reclutas reales", "Bárbaros de élite", "Puercos reales",
-        "Duendes reales", "Rey esqueleto", "Murciélagos", "Esbirros", "Dragones esqueleto",
-        "Espíritu de hielo", "Espíritu de fuego", "Espíritu eléctrico", "Espíritu sanador",
-        "Bombardero", "Lanzarrocas", "Verdugo", "Lanzadardos", "Trío de mosqueteras",
-        "Máquina voladora", "Gólem de hielo", "Gólem de elixir", "Guardabosques"
+        "Globo Bombástico", "Ejército de Esqueletos", "Mago", "Horda de Esbirros",
+        "Duendes", "Duendes con Lanza", "Montapuercos", "P.E.K.K.A", "Mago de Hielo",
+        "Mago Eléctrico", "Chispitas", "Dragón Eléctrico", "Leñador", "Megaesbirro",
+        "Megacaballero", "Minero", "Príncipe Oscuro", "Bandida", "Fantasma Real",
+        "Bruja Nocturna", "Cazador", "Pescador", "Arquero Mágico", "Esqueleto Gigante",
+        "Dragón Infernal", "Gigante Noble", "Gigante Eléctrico", "Duende Gigante",
+        "Curandera Guerrera", "Guardias", "Reclutas Reales", "Bárbaros de Élite",
+        "Puercos Reales", "Duendes Reales", "Murciélagos", "Esbirros", "Dragones Esqueleto",
+        "Espíritu de Hielo", "Espíritu de Fuego", "Espíritu Eléctrico", "Espíritu Sanador",
+        "Bombardero", "Lanzarrocas", "Verdugo", "Lanzadardos", "Trío de Mosqueteras",
+        "Máquina Voladora", "Gólem de Hielo", "Gólem de Elixir", "Duende Lanzadardos",
+        "Guardabosques", "Duendes con Hacha",
+        // Hechizos
+        "Flechas", "Bola de Fuego", "Rayo", "Descarga", "Cohete", "Veneno", "Tornado",
+        "El Tronco", "Terremoto", "Hielo", "Clon", "Bola de Nieve", "Furia", "Espejo",
+        "Cementerio", "Barril de Duendes", "Barril de Bárbaros", "Paquete Real",
+        // Estructuras
+        "Torre Bombardera", "Ballesta", "Cañón", "Mortero", "Torre Infernal", "Torre Tesla",
+        "Choza de Bárbaros", "Choza de Duendes", "Lápida", "Horno", "Recolector de Elixir",
+        "Jaula del Forzudo",
+        // Campeones
+        "Reina Arquera", "Rey Esqueleto", "Caballero Dorado", "Minero Poderoso", "Monje"
     ]
 };
 
@@ -119,6 +130,10 @@ let chatMessages = [];
 let currentTurnIndex = 0;
 let playerOrder = [];
 let turnsFinished = false;
+let roomScore = {
+    impostors: 0,
+    crew: 0
+};
 
 // DOM Elements - Name Screen
 const nameScreen = document.getElementById('name-screen');
@@ -147,6 +162,12 @@ const discussionSectionOral = document.getElementById('discussion-section-oral')
 const discussionSectionChat = document.getElementById('discussion-section-chat');
 const nextRoundOralBtn = document.getElementById('next-round-oral-btn');
 const startVoteBtn = document.getElementById('start-vote-btn');
+const victoryButtonsOral = document.getElementById('victory-buttons-oral');
+const victoryButtonsChat = document.getElementById('victory-buttons-chat');
+const impostorWinOralBtn = document.getElementById('impostor-win-oral-btn');
+const crewWinOralBtn = document.getElementById('crew-win-oral-btn');
+const impostorWinChatBtn = document.getElementById('impostor-win-chat-btn');
+const crewWinChatBtn = document.getElementById('crew-win-chat-btn');
 
 // DOM Elements - Online
 const onlineRoomScreen = document.getElementById('online-room-screen');
@@ -167,6 +188,8 @@ const hostControls = document.getElementById('host-controls');
 const themeLobby = document.getElementById('theme-lobby');
 const impostorsLobby = document.getElementById('impostors-lobby');
 const startOnlineGameBtn = document.getElementById('start-online-game');
+const impostorScoreEl = document.getElementById('impostor-score');
+const crewScoreEl = document.getElementById('crew-score');
 const leaveRoomBtn = document.getElementById('leave-room-btn');
 
 // DOM Elements - Local Setup
@@ -364,6 +387,31 @@ nextRoundOralBtn.addEventListener('click', () => {
 startVoteBtn.addEventListener('click', () => {
     if (gameState.isHost) {
         initVoting();
+    }
+});
+
+// Event Listeners - Victory Buttons
+impostorWinOralBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        declareWinner('impostor', 'oral');
+    }
+});
+
+crewWinOralBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        declareWinner('crew', 'oral');
+    }
+});
+
+impostorWinChatBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        declareWinner('impostor', 'chat');
+    }
+});
+
+crewWinChatBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        declareWinner('crew', 'chat');
     }
 });
 
@@ -631,6 +679,19 @@ function setupConnectionHandlers(conn) {
                     votingOptions.appendChild(option);
                 });
                 break;
+                
+            case 'update_score':
+                roomScore = data.score;
+                updateScoreboard();
+                break;
+                
+            case 'back_to_lobby':
+                onlineGameScreen.classList.add('hidden');
+                chatGameScreen.classList.add('hidden');
+                lobbyScreen.classList.remove('hidden');
+                victoryButtonsOral.classList.add('hidden');
+                victoryButtonsChat.classList.add('hidden');
+                break;
         }
     });
     
@@ -829,15 +890,17 @@ function nextTurn(mode) {
         if (mode === 'oral') {
             turnSectionOral.classList.add('hidden');
             discussionSectionOral.classList.remove('hidden');
-            // Mostrar botón siguiente ronda solo al anfitrión
+            // Mostrar botones de victoria y siguiente ronda solo al anfitrión
             if (gameState.isHost) {
+                victoryButtonsOral.classList.remove('hidden');
                 nextRoundOralBtn.classList.remove('hidden');
             }
         } else {
             turnSectionChat.classList.add('hidden');
             discussionSectionChat.classList.remove('hidden');
-            // Mostrar botón votación solo al anfitrión
+            // Mostrar botones de victoria y votación solo al anfitrión
             if (gameState.isHost) {
+                victoryButtonsChat.classList.remove('hidden');
                 startVoteBtn.classList.remove('hidden');
             }
         }
@@ -910,11 +973,63 @@ function displayChatHistory() {
     });
 }
 
+function declareWinner(winner, mode) {
+    // Actualizar marcador
+    if (winner === 'impostor') {
+        roomScore.impostors++;
+    } else {
+        roomScore.crew++;
+    }
+    
+    updateScoreboard();
+    
+    // Broadcast a todos
+    connections.forEach(conn => {
+        conn.send({
+            type: 'update_score',
+            score: roomScore
+        });
+    });
+    
+    // Mostrar mensaje
+    const winnerText = winner === 'impostor' ? '🔴 Impostores' : '🔵 Tripulación';
+    showToast(`${winnerText} ganó esta ronda!`, 'success', 'Victoria');
+    
+    // Volver al lobby después de 2 segundos
+    setTimeout(() => {
+        if (mode === 'oral') {
+            onlineGameScreen.classList.add('hidden');
+        } else {
+            chatGameScreen.classList.add('hidden');
+        }
+        lobbyScreen.classList.remove('hidden');
+        
+        // Resetear UI
+        victoryButtonsOral.classList.add('hidden');
+        victoryButtonsChat.classList.add('hidden');
+        nextRoundOralBtn.classList.add('hidden');
+        startVoteBtn.classList.add('hidden');
+        
+        // Broadcast volver al lobby
+        connections.forEach(conn => {
+            conn.send({
+                type: 'back_to_lobby'
+            });
+        });
+    }, 2000);
+}
+
+function updateScoreboard() {
+    impostorScoreEl.textContent = roomScore.impostors;
+    crewScoreEl.textContent = roomScore.crew;
+}
+
 function startNewRound(mode) {
     // Reiniciar turnos
     currentTurnIndex = 0;
     turnsFinished = false;
     nextRoundOralBtn.classList.add('hidden');
+    victoryButtonsOral.classList.add('hidden');
     
     // Volver a fase de turnos
     discussionSectionOral.classList.add('hidden');

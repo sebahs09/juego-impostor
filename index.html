@@ -76,6 +76,19 @@
         <!-- Room Lobby Screen -->
         <div id="lobby-screen" class="screen hidden">
             <h2>Sala: <span id="room-code-display"></span></h2>
+            
+            <!-- Scoreboard -->
+            <div class="scoreboard">
+                <div class="score-item">
+                    <span class="score-label">🔴 Impostores:</span>
+                    <span class="score-value" id="impostor-score">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-label">🔵 Tripulación:</span>
+                    <span class="score-value" id="crew-score">0</span>
+                </div>
+            </div>
+            
             <div class="share-link">
                 <p>Comparte este código con tus amigos:</p>
                 <div class="code-box" id="share-code"></div>
@@ -159,6 +172,10 @@
             <div class="discussion-section hidden" id="discussion-section-oral">
                 <h3>💬 Discusión Libre</h3>
                 <p>Todos pueden hablar libremente ahora</p>
+                <div class="victory-buttons hidden" id="victory-buttons-oral">
+                    <button id="impostor-win-oral-btn" class="btn btn-impostor">🔴 Ganó Impostor</button>
+                    <button id="crew-win-oral-btn" class="btn btn-crew">🔵 Ganó Tripulación</button>
+                </div>
                 <button id="next-round-oral-btn" class="btn hidden">Siguiente Ronda</button>
             </div>
             
@@ -188,6 +205,10 @@
                         <input type="text" id="chat-input" class="form-control" placeholder="Escribe un mensaje...">
                         <button id="send-message-btn" class="btn btn-small">Enviar</button>
                     </div>
+                </div>
+                <div class="victory-buttons hidden" id="victory-buttons-chat">
+                    <button id="impostor-win-chat-btn" class="btn btn-impostor">🔴 Ganó Impostor</button>
+                    <button id="crew-win-chat-btn" class="btn btn-crew">🔵 Ganó Tripulación</button>
                 </div>
                 <button id="start-vote-btn" class="btn hidden">Iniciar Votación</button>
             </div>
