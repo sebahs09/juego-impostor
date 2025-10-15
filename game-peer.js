@@ -145,6 +145,8 @@ const nextTurnOralBtn = document.getElementById('next-turn-oral-btn');
 const nextTurnChatBtn = document.getElementById('next-turn-chat-btn');
 const discussionSectionOral = document.getElementById('discussion-section-oral');
 const discussionSectionChat = document.getElementById('discussion-section-chat');
+const nextRoundOralBtn = document.getElementById('next-round-oral-btn');
+const startVoteBtn = document.getElementById('start-vote-btn');
 
 // DOM Elements - Online
 const onlineRoomScreen = document.getElementById('online-room-screen');
@@ -193,7 +195,6 @@ const toggleWordChatBtn = document.getElementById('toggle-word-chat-btn');
 const chatMessagesDiv = document.getElementById('chat-messages');
 const chatInput = document.getElementById('chat-input');
 const sendMessageBtn = document.getElementById('send-message-btn');
-const startVoteBtn = document.getElementById('start-vote-btn');
 
 // DOM Elements - Voting
 const votingScreen = document.getElementById('voting-screen');
@@ -338,8 +339,33 @@ backToLobbyChatBtn.addEventListener('click', () => {
 });
 
 // Event Listeners - Turns
-nextTurnOralBtn.addEventListener('click', () => nextTurn('oral'));
-nextTurnChatBtn.addEventListener('click', () => nextTurn('chat'));
+nextTurnOralBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        nextTurn('oral');
+    } else {
+        showToast('Solo el anfitrión puede pasar turnos', 'error', 'Permiso Denegado');
+    }
+});
+
+nextTurnChatBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        nextTurn('chat');
+    } else {
+        showToast('Solo el anfitrión puede pasar turnos', 'error', 'Permiso Denegado');
+    }
+});
+
+nextRoundOralBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        startNewRound('oral');
+    }
+});
+
+startVoteBtn.addEventListener('click', () => {
+    if (gameState.isHost) {
+        initVoting();
+    }
+});
 
 // Event Listeners - Chat
 sendMessageBtn.addEventListener('click', sendMessage);
@@ -347,7 +373,7 @@ chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-startVoteBtn.addEventListener('click', startVoting);
+// Event Listeners - Voting
 revealResultsBtn.addEventListener('click', revealVoteResults);
 backFromVoteBtn.addEventListener('click', () => {
     votingScreen.classList.add('hidden');
@@ -582,6 +608,29 @@ function setupConnectionHandlers(conn) {
                     discussionSectionChat.classList.remove('hidden');
                 }
                 break;
+                
+            case 'new_round':
+                currentTurnIndex = 0;
+                turnsFinished = false;
+                discussionSectionOral.classList.add('hidden');
+                turnSectionOral.classList.remove('hidden');
+                updateCurrentTurn(data.mode);
+                break;
+                
+            case 'start_voting':
+                chatGameScreen.classList.add('hidden');
+                votingScreen.classList.remove('hidden');
+                votingOptions.innerHTML = '';
+                Object.values(roomPlayers).forEach(player => {
+                    const option = document.createElement('div');
+                    option.className = 'vote-option';
+                    option.innerHTML = `
+                        <h3>${player.name}</h3>
+                        <button class="btn" onclick="castVote('${player.id}')">Votar</button>
+                    `;
+                    votingOptions.appendChild(option);
+                });
+                break;
         }
     });
     
@@ -749,15 +798,24 @@ function updateCurrentTurn(mode) {
     if (!currentPlayer) return;
     
     const isLastTurn = currentTurnIndex === playerOrder.length - 1;
+    const isHost = gameState.isHost;
     
     if (mode === 'oral') {
         currentTurnOral.textContent = currentPlayer.name;
-        nextTurnOralBtn.classList.remove('hidden');
-        nextTurnOralBtn.textContent = isLastTurn ? 'Iniciar Discusión' : 'Pasar Turno';
+        if (isHost) {
+            nextTurnOralBtn.classList.remove('hidden');
+            nextTurnOralBtn.textContent = isLastTurn ? 'Iniciar Discusión' : 'Pasar Turno';
+        } else {
+            nextTurnOralBtn.classList.add('hidden');
+        }
     } else {
         currentTurnChat.textContent = currentPlayer.name;
-        nextTurnChatBtn.classList.remove('hidden');
-        nextTurnChatBtn.textContent = isLastTurn ? 'Iniciar Votación' : 'Pasar Turno';
+        if (isHost) {
+            nextTurnChatBtn.classList.remove('hidden');
+            nextTurnChatBtn.textContent = isLastTurn ? 'Iniciar Discusión' : 'Pasar Turno';
+        } else {
+            nextTurnChatBtn.classList.add('hidden');
+        }
     }
 }
 
@@ -771,9 +829,17 @@ function nextTurn(mode) {
         if (mode === 'oral') {
             turnSectionOral.classList.add('hidden');
             discussionSectionOral.classList.remove('hidden');
+            // Mostrar botón siguiente ronda solo al anfitrión
+            if (gameState.isHost) {
+                nextRoundOralBtn.classList.remove('hidden');
+            }
         } else {
             turnSectionChat.classList.add('hidden');
             discussionSectionChat.classList.remove('hidden');
+            // Mostrar botón votación solo al anfitrión
+            if (gameState.isHost) {
+                startVoteBtn.classList.remove('hidden');
+            }
         }
         
         // Broadcast a todos
@@ -841,6 +907,49 @@ function displayChatHistory() {
     chatMessagesDiv.innerHTML = '';
     chatMessages.forEach(msg => {
         displayMessage(msg, msg.senderId === gameState.playerId);
+    });
+}
+
+function startNewRound(mode) {
+    // Reiniciar turnos
+    currentTurnIndex = 0;
+    turnsFinished = false;
+    nextRoundOralBtn.classList.add('hidden');
+    
+    // Volver a fase de turnos
+    discussionSectionOral.classList.add('hidden');
+    turnSectionOral.classList.remove('hidden');
+    updateCurrentTurn(mode);
+    
+    // Broadcast a todos
+    connections.forEach(conn => {
+        conn.send({
+            type: 'new_round',
+            mode: mode
+        });
+    });
+}
+
+function initVoting() {
+    chatGameScreen.classList.add('hidden');
+    votingScreen.classList.remove('hidden');
+    
+    votingOptions.innerHTML = '';
+    Object.values(roomPlayers).forEach(player => {
+        const option = document.createElement('div');
+        option.className = 'vote-option';
+        option.innerHTML = `
+            <h3>${player.name}</h3>
+            <button class="btn" onclick="castVote('${player.id}')">Votar</button>
+        `;
+        votingOptions.appendChild(option);
+    });
+    
+    // Broadcast a todos
+    connections.forEach(conn => {
+        conn.send({
+            type: 'start_voting'
+        });
     });
 }
 
