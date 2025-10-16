@@ -891,31 +891,81 @@ function loadOnlineGame(gameData) {
     if (gameData.mode === 'oral') {
         onlineGameScreen.classList.remove('hidden');
         onlinePlayerName.textContent = gameState.playerName || 'Jugador';
-        wordDisplayOnline.textContent = myWord;
-        wordDisplayOnline.dataset.word = myWord;
-        wordDisplayOnline.style.color = isImpostor ? '#ef4444' : '#10b981';
-        wordDisplayOnline.style.opacity = '1';
-        wordVisible = true;
         
-        // Mostrar primer turno
-        turnSectionOral.classList.remove('hidden');
-        discussionSectionOral.classList.add('hidden');
-        updateCurrentTurn('oral');
+        // Iniciar animación de carta
+        const cardContainerOral = document.getElementById('card-container-oral');
+        const cardFlipOral = document.getElementById('card-flip-oral');
+        const cardBackOral = document.getElementById('card-back-oral');
+        const cardResultOral = document.getElementById('card-result-oral');
+        const wordLabelOral = document.getElementById('word-label-oral');
         
-        backToLobbyBtn.classList.remove('hidden');
+        cardFlipOral.classList.add('flipping');
+        
+        setTimeout(() => {
+            if (isImpostor) {
+                cardBackOral.classList.add('impostor');
+            } else {
+                cardBackOral.classList.add('crew');
+            }
+            cardResultOral.textContent = myWord;
+        }, 1000);
+        
+        setTimeout(() => {
+            cardContainerOral.classList.add('hidden');
+            wordLabelOral.classList.remove('hidden');
+            wordDisplayOnline.classList.remove('hidden');
+            wordDisplayOnline.textContent = myWord;
+            wordDisplayOnline.dataset.word = myWord;
+            wordDisplayOnline.style.color = isImpostor ? '#ef4444' : '#10b981';
+            wordDisplayOnline.style.opacity = '1';
+            wordVisible = true;
+            document.getElementById('toggle-word-btn').classList.remove('hidden');
+            
+            // Mostrar primer turno
+            turnSectionOral.classList.remove('hidden');
+            discussionSectionOral.classList.add('hidden');
+            updateCurrentTurn('oral');
+            backToLobbyBtn.classList.remove('hidden');
+        }, 2500);
+        
     } else {
         chatGameScreen.classList.remove('hidden');
         chatPlayerName.textContent = gameState.playerName || 'Jugador';
-        wordDisplayChat.textContent = myWord;
-        wordDisplayChat.dataset.word = myWord;
-        wordDisplayChat.style.color = isImpostor ? '#ef4444' : '#10b981';
-        wordDisplayChat.style.opacity = '1';
-        wordVisibleChat = true;
         
-        // Mostrar primer turno
-        turnSectionChat.classList.remove('hidden');
-        discussionSectionChat.classList.add('hidden');
-        updateCurrentTurn('chat');
+        // Iniciar animación de carta
+        const cardContainerChat = document.getElementById('card-container-chat');
+        const cardFlipChat = document.getElementById('card-flip-chat');
+        const cardBackChat = document.getElementById('card-back-chat');
+        const cardResultChat = document.getElementById('card-result-chat');
+        const wordLabelChat = document.getElementById('word-label-chat');
+        
+        cardFlipChat.classList.add('flipping');
+        
+        setTimeout(() => {
+            if (isImpostor) {
+                cardBackChat.classList.add('impostor');
+            } else {
+                cardBackChat.classList.add('crew');
+            }
+            cardResultChat.textContent = myWord;
+        }, 1000);
+        
+        setTimeout(() => {
+            cardContainerChat.classList.add('hidden');
+            wordLabelChat.classList.remove('hidden');
+            wordDisplayChat.classList.remove('hidden');
+            wordDisplayChat.textContent = myWord;
+            wordDisplayChat.dataset.word = myWord;
+            wordDisplayChat.style.color = isImpostor ? '#ef4444' : '#10b981';
+            wordDisplayChat.style.opacity = '1';
+            wordVisibleChat = true;
+            document.getElementById('toggle-word-chat-btn').classList.remove('hidden');
+            
+            // Mostrar primer turno
+            turnSectionChat.classList.remove('hidden');
+            discussionSectionChat.classList.add('hidden');
+            updateCurrentTurn('chat');
+        }, 2500);
     }
 }
 

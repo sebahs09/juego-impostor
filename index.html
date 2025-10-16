@@ -240,9 +240,25 @@
         <!-- Online Game Screen (Oral Mode) -->
         <div id="online-game-screen" class="screen hidden">
             <h2 id="online-player-name">Esperando...</h2>
-            <p class="instruction">Tu palabra es:</p>
-            <div class="word-display-online" id="word-display-online">Cargando...</div>
-            <button id="toggle-word-btn" class="btn btn-small">👁️ Ocultar Palabra</button>
+            
+            <!-- Card Flip Animation - Online Oral -->
+            <div id="card-container-oral" class="card-container">
+                <div class="card-flip" id="card-flip-oral">
+                    <div class="card-front">
+                        <div class="card-pattern"></div>
+                        <div class="card-icon">🎴</div>
+                        <div class="card-question">?</div>
+                    </div>
+                    <div class="card-back" id="card-back-oral">
+                        <div class="card-result" id="card-result-oral">?</div>
+                    </div>
+                </div>
+                <p class="tap-instruction">👆 Toca para revelar</p>
+            </div>
+            
+            <p class="instruction hidden" id="word-label-oral">Tu palabra es:</p>
+            <div class="word-display-online hidden" id="word-display-online">Cargando...</div>
+            <button id="toggle-word-btn" class="btn btn-small hidden">👁️ Ocultar Palabra</button>
             
             <div class="turn-section" id="turn-section-oral">
                 <h3>⏱️ Fase de Turnos</h3>
@@ -268,9 +284,25 @@
         <!-- Online Game Screen (Chat Mode) -->
         <div id="chat-game-screen" class="screen hidden">
             <h2 id="chat-player-name">Esperando...</h2>
-            <p class="instruction">Tu palabra es:</p>
-            <div class="word-display-online" id="word-display-chat">Cargando...</div>
-            <button id="toggle-word-chat-btn" class="btn btn-small">👁️ Ocultar Palabra</button>
+            
+            <!-- Card Flip Animation - Online Chat -->
+            <div id="card-container-chat" class="card-container">
+                <div class="card-flip" id="card-flip-chat">
+                    <div class="card-front">
+                        <div class="card-pattern"></div>
+                        <div class="card-icon">🎴</div>
+                        <div class="card-question">?</div>
+                    </div>
+                    <div class="card-back" id="card-back-chat">
+                        <div class="card-result" id="card-result-chat">?</div>
+                    </div>
+                </div>
+                <p class="tap-instruction">👆 Toca para revelar</p>
+            </div>
+            
+            <p class="instruction hidden" id="word-label-chat">Tu palabra es:</p>
+            <div class="word-display-online hidden" id="word-display-chat">Cargando...</div>
+            <button id="toggle-word-chat-btn" class="btn btn-small hidden">👁️ Ocultar Palabra</button>
             
             <div class="turn-section" id="turn-section-chat">
                 <h3>⏱️ Fase de Turnos</h3>
