@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+html {
+    height: 100%;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -7,22 +11,8 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Optimizaciones de rendimiento */
-* {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.container,
-.btn,
-.mode-btn,
-.welcome-screen {
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-}
-
 body {
+    margin: 0;
     background: #0f0f1e;
     color: #e0e0e0;
     min-height: 100vh;
@@ -30,57 +20,35 @@ body {
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: hidden;
 }
 
 .bg {
+    animation: slide 3s ease-in-out infinite alternate;
+    background-image: linear-gradient(-60deg, #1a1a2e 50%, #0f3460 50%);
+    bottom: 0;
+    left: -50%;
+    opacity: .5;
     position: fixed;
-    width: 200vw;
-    height: 200vh;
-    top: -50vh;
-    left: -50vw;
+    right: -50%;
+    top: 0;
     z-index: -1;
-    background: linear-gradient(135deg, 
-        transparent 0%, 
-        rgba(26, 26, 46, 0.8) 25%, 
-        rgba(22, 33, 62, 0.9) 50%, 
-        rgba(15, 52, 96, 0.8) 75%, 
-        transparent 100%);
-    animation: slide 20s ease-in-out infinite;
 }
 
 .bg2 {
-    background: linear-gradient(225deg, 
-        transparent 0%, 
-        rgba(15, 52, 96, 0.6) 25%, 
-        rgba(22, 33, 62, 0.7) 50%, 
-        rgba(26, 26, 46, 0.6) 75%, 
-        transparent 100%);
-    animation: slide 25s ease-in-out infinite reverse;
+    animation-direction: alternate-reverse;
+    animation-duration: 4s;
 }
 
 .bg3 {
-    background: linear-gradient(315deg, 
-        transparent 0%, 
-        rgba(22, 33, 62, 0.5) 25%, 
-        rgba(15, 52, 96, 0.6) 50%, 
-        rgba(26, 26, 46, 0.5) 75%, 
-        transparent 100%);
-    animation: slide 30s ease-in-out infinite;
+    animation-duration: 5s;
 }
 
 @keyframes slide {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg);
+    0% {
+        transform: translateX(-25%);
     }
-    25% {
-        transform: translate(10%, -10%) rotate(5deg);
-    }
-    50% {
-        transform: translate(-10%, 10%) rotate(-5deg);
-    }
-    75% {
-        transform: translate(5%, -5%) rotate(3deg);
+    100% {
+        transform: translateX(25%);
     }
 }
 
@@ -110,30 +78,7 @@ body.impostor-theme {
 }
 
 body.impostor-theme .bg {
-    background: linear-gradient(135deg, 
-        transparent 0%, 
-        rgba(139, 26, 26, 0.8) 25%, 
-        rgba(90, 15, 15, 0.9) 50%, 
-        rgba(139, 26, 26, 0.8) 75%, 
-        transparent 100%);
-}
-
-body.impostor-theme .bg2 {
-    background: linear-gradient(225deg, 
-        transparent 0%, 
-        rgba(90, 15, 15, 0.6) 25%, 
-        rgba(139, 26, 26, 0.7) 50%, 
-        rgba(90, 15, 15, 0.6) 75%, 
-        transparent 100%);
-}
-
-body.impostor-theme .bg3 {
-    background: linear-gradient(315deg, 
-        transparent 0%, 
-        rgba(139, 26, 26, 0.5) 25%, 
-        rgba(90, 15, 15, 0.6) 50%, 
-        rgba(139, 26, 26, 0.5) 75%, 
-        transparent 100%);
+    background-image: linear-gradient(-60deg, #8b1a1a 50%, #5a0f0f 50%);
 }
 
 body.impostor-theme .container {
@@ -148,30 +93,7 @@ body.crew-theme {
 }
 
 body.crew-theme .bg {
-    background: linear-gradient(135deg, 
-        transparent 0%, 
-        rgba(26, 92, 58, 0.8) 25%, 
-        rgba(15, 61, 38, 0.9) 50%, 
-        rgba(26, 92, 58, 0.8) 75%, 
-        transparent 100%);
-}
-
-body.crew-theme .bg2 {
-    background: linear-gradient(225deg, 
-        transparent 0%, 
-        rgba(15, 61, 38, 0.6) 25%, 
-        rgba(26, 92, 58, 0.7) 50%, 
-        rgba(15, 61, 38, 0.6) 75%, 
-        transparent 100%);
-}
-
-body.crew-theme .bg3 {
-    background: linear-gradient(315deg, 
-        transparent 0%, 
-        rgba(26, 92, 58, 0.5) 25%, 
-        rgba(15, 61, 38, 0.6) 50%, 
-        rgba(26, 92, 58, 0.5) 75%, 
-        transparent 100%);
+    background-image: linear-gradient(-60deg, #1a5c3a 50%, #0f3d26 50%);
 }
 
 body.crew-theme .container {
