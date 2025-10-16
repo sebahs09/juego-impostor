@@ -19,6 +19,7 @@
                 <input type="text" id="player-name-input" class="form-control" placeholder="Tu nombre" maxlength="20" autofocus>
             </div>
             <button id="continue-btn" class="btn">Continuar</button>
+            <button id="show-rules-btn" class="btn btn-secondary">📖 Cómo Jugar</button>
         </div>
 
         <!-- Mode Selection Screen -->
@@ -246,6 +247,94 @@
     <button id="toggle-chat-btn" class="chat-toggle-btn hidden">
         💬
     </button>
+
+    <!-- Rules Modal -->
+    <div id="rules-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="close-rules-btn">✕</button>
+            <h2>📖 Cómo Jugar</h2>
+            
+            <div class="rules-section">
+                <h3>🎯 Objetivo del Juego</h3>
+                <p><strong>Civiles:</strong> Descubrir quién es el impostor</p>
+                <p><strong>Impostor:</strong> No ser descubierto y ganar puntos</p>
+            </div>
+
+            <div class="rules-section">
+                <h3>👥 Roles</h3>
+                <p><strong>🔵 Civiles (Mayoría):</strong> Reciben la misma palabra secreta</p>
+                <p><strong>🔴 Impostor(es):</strong> Reciben la palabra "IMPOSTOR"</p>
+            </div>
+
+            <div class="rules-section">
+                <h3>🎮 Fases del Juego</h3>
+                
+                <div class="phase">
+                    <h4>1️⃣ Fase de Turnos</h4>
+                    <ul>
+                        <li>Cada jugador describe su palabra en su turno</li>
+                        <li>No reveles tu palabra directamente</li>
+                        <li>El anfitrión controla los turnos</li>
+                    </ul>
+                </div>
+
+                <div class="phase">
+                    <h4>2️⃣ Fase de Discusión</h4>
+                    <ul>
+                        <li><strong>Modo Oral:</strong> Discusión libre por voz</li>
+                        <li><strong>Modo Chat:</strong> Chat de texto + votación</li>
+                        <li>Analiza las descripciones y encuentra al impostor</li>
+                    </ul>
+                </div>
+
+                <div class="phase">
+                    <h4>3️⃣ Declaración de Ganador</h4>
+                    <ul>
+                        <li>Solo el anfitrión puede declarar al ganador</li>
+                        <li><strong>🔴 Ganó Impostor:</strong> Si no fue descubierto</li>
+                        <li><strong>🔵 Ganó Tripulación:</strong> Si descubrieron al impostor</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="rules-section">
+                <h3>🏆 Sistema de Puntos</h3>
+                <ul>
+                    <li><strong>Ronda 1:</strong> +1 punto si gana el impostor</li>
+                    <li><strong>Ronda 2:</strong> +2 puntos si gana el impostor</li>
+                    <li><strong>Ronda 3:</strong> +3 puntos si gana el impostor</li>
+                    <li><strong>Y así sucesivamente...</strong></li>
+                    <li>⚠️ La tripulación NO suma puntos</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>🎲 Opciones del Anfitrión</h3>
+                <ul>
+                    <li><strong>Siguiente Ronda:</strong> Continuar jugando sin volver al lobby</li>
+                    <li><strong>Ganó Impostor/Tripulación:</strong> Terminar ronda y volver al lobby</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>💡 Consejos</h3>
+                <ul>
+                    <li>🎭 <strong>Civiles:</strong> Den pistas sutiles para identificarse entre ustedes</li>
+                    <li>🕵️ <strong>Impostor:</strong> Escucha atentamente y trata de adivinar la palabra</li>
+                    <li>🤔 Observa las reacciones y descripciones de los demás</li>
+                    <li>🗣️ Sé creativo pero no demasiado obvio</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h3>🎯 Modos de Juego</h3>
+                <p><strong>📱 Modo Local:</strong> Todos en el mismo dispositivo</p>
+                <p><strong>🔗 Modo Online:</strong> Cada jugador en su dispositivo</p>
+                <p><strong>🗣️ Modo Oral:</strong> Discusión por voz</p>
+                <p><strong>✉️ Modo Chat:</strong> Chat de texto con votación</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

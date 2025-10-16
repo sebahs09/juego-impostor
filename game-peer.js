@@ -230,6 +230,27 @@ const backFromVoteBtn = document.getElementById('back-from-vote');
 const nextPlayerButton = document.getElementById('next-player');
 const playAgainButton = document.getElementById('play-again');
 
+// DOM Elements - Rules Modal
+const rulesModal = document.getElementById('rules-modal');
+const showRulesBtn = document.getElementById('show-rules-btn');
+const closeRulesBtn = document.getElementById('close-rules-btn');
+
+// Event Listeners - Rules Modal
+showRulesBtn.addEventListener('click', () => {
+    rulesModal.classList.remove('hidden');
+});
+
+closeRulesBtn.addEventListener('click', () => {
+    rulesModal.classList.add('hidden');
+});
+
+// Cerrar modal al hacer clic fuera del contenido
+rulesModal.addEventListener('click', (e) => {
+    if (e.target === rulesModal) {
+        rulesModal.classList.add('hidden');
+    }
+});
+
 // Event Listeners - Mode Selection
 localModeBtn.addEventListener('click', () => {
     gameState.mode = 'local';
