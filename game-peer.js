@@ -231,6 +231,7 @@ const nextPlayerButton = document.getElementById('next-player');
 const playAgainButton = document.getElementById('play-again');
 const gameEndButtons = document.getElementById('game-end-buttons');
 const nextRoundLocalBtn = document.getElementById('next-round-local');
+const newGameLocalBtn = document.getElementById('new-game-local');
 
 // DOM Elements - Rules Modal
 const rulesModal = document.getElementById('rules-modal');
@@ -343,6 +344,7 @@ startButton.addEventListener('click', startLocalGame);
 nextPlayerButton.addEventListener('click', nextPlayer);
 playAgainButton.addEventListener('click', resetGame);
 nextRoundLocalBtn.addEventListener('click', startNextRoundLocal);
+newGameLocalBtn.addEventListener('click', startNewGameLocal);
 gameScreen.addEventListener('click', revealWord);
 
 // Event Listeners - Toggle Word (Oral Mode)
@@ -1415,7 +1417,24 @@ function startNextRoundLocal() {
     // Resetear tema
     document.body.classList.remove('impostor-theme', 'crew-theme');
     
-    // Reiniciar el juego con la misma configuración
+    // Reiniciar turnos pero mantener las mismas palabras
+    gameState.currentPlayer = 1;
+    gameState.revealed = false;
+    
+    // Resetear UI
+    currentPlayerNumber.textContent = '1';
+    revealCard.classList.add('hidden');
+    gameEndButtons.classList.add('hidden');
+    wordDisplay.textContent = '';
+    
+    showToast('¡Siguiente ronda! Mismas palabras', 'success', 'Ronda Continúa');
+}
+
+function startNewGameLocal() {
+    // Resetear tema
+    document.body.classList.remove('impostor-theme', 'crew-theme');
+    
+    // Reiniciar el juego con nuevas palabras
     gameState.currentPlayer = 1;
     gameState.revealed = false;
     
@@ -1439,6 +1458,8 @@ function startNextRoundLocal() {
     revealCard.classList.add('hidden');
     gameEndButtons.classList.add('hidden');
     wordDisplay.textContent = '';
+    
+    showToast('¡Nueva partida con palabras diferentes!', 'success', 'Nueva Partida');
 }
 
 function resetGame() {
