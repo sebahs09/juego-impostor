@@ -663,6 +663,11 @@ function setupConnectionHandlers(conn) {
             case 'new_round':
                 currentTurnIndex = 0;
                 turnsFinished = false;
+                // Sincronizar ronda
+                if (data.round) {
+                    currentRound = data.round;
+                    updateScoreboard();
+                }
                 discussionSectionOral.classList.add('hidden');
                 turnSectionOral.classList.remove('hidden');
                 updateCurrentTurn(data.mode);
@@ -1103,6 +1108,12 @@ function updateScoreboard() {
 }
 
 function startNewRound(mode) {
+    // Incrementar ronda
+    currentRound++;
+    
+    // Actualizar indicador de ronda
+    updateScoreboard();
+    
     // Reiniciar turnos
     currentTurnIndex = 0;
     turnsFinished = false;
@@ -1118,7 +1129,8 @@ function startNewRound(mode) {
     connections.forEach(conn => {
         conn.send({
             type: 'new_round',
-            mode: mode
+            mode: mode,
+            round: currentRound
         });
     });
 }
