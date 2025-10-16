@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /game-peer.js
+Disallow: /.htaccess
+
+Sitemap: https://sebahs09.github.io/juego-impostor/sitemap.xml

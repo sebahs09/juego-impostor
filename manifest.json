@@ -1,0 +1,21 @@
+{
+  "name": "El Impostor - Juego Social Multijugador",
+  "short_name": "El Impostor",
+  "description": "Juego de deducción social multijugador online. Descubre quién es el impostor con tus amigos.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f0f1e",
+  "theme_color": "#0f0f1e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎭</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment", "social"],
+  "lang": "es",
+  "dir": "ltr"
+}

@@ -11,6 +11,25 @@ html {
     font-family: 'Poppins', sans-serif;
 }
 
+/* Optimización global para animaciones sin límite de FPS */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    * {
+        animation-timing-function: linear;
+    }
+}
+
+/* Forzar aceleración de hardware en elementos animados */
+.bg, .container, .modal, .btn, .toast, .chat-widget {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
 body {
     margin: 0;
     background: #0f0f1e;

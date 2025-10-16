@@ -3,11 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO Meta Tags -->
+    <title>El Impostor - Juego Social Online Multijugador | Deducción y Engaño</title>
+    <meta name="description" content="Juega al Impostor gratis online. Juego multijugador de deducción social tipo Among Us. Descubre quién es el impostor con amigos. Modo local y online disponibles.">
+    <meta name="keywords" content="el impostor, juego impostor, among us español, juego social online, multijugador, deducción, party game, juego gratis">
+    <meta name="author" content="Sebastián">
+    <meta name="theme-color" content="#0f0f1e">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="El Impostor - Juego Social Multijugador">
+    <meta property="og:description" content="Juego de deducción social gratis. Descubre al impostor jugando con amigos online o local.">
+    <meta property="og:image" content="https://sebahs09.github.io/juego-impostor/preview.png">
+    <meta property="og:url" content="https://sebahs09.github.io/juego-impostor/">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="El Impostor - Juego Social Multijugador">
+    <meta name="twitter:description" content="Juego de deducción social gratis online">
+    
+    <!-- Mobile Web App -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>El Impostor</title>
+    <meta name="apple-mobile-web-app-title" content="El Impostor">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://0.peerjs.com">
+    
+    <!-- Icons -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎭</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎭</text></svg>">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "El Impostor",
+      "description": "Juego social multijugador de deducción donde debes descubrir quién es el impostor",
+      "url": "https://sebahs09.github.io/juego-impostor/",
+      "applicationCategory": "GameApplication",
+      "genre": "Social Deduction Game",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Sebastián"
+      },
+      "inLanguage": "es",
+      "playMode": "MultiPlayer"
+    }
+    </script>
 </head>
 <body>
     <div class="bg"></div>
@@ -341,11 +401,11 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>© 2025 El Impostor - Creado por <strong>Sebastián</strong></p>
+        <p> 2025 El Impostor - Creado por <strong>Sebastián</strong></p>
     </footer>
     
     <!-- PeerJS - Conexión P2P gratuita -->
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script src="game-peer.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
+    <script src="game-peer.js" defer></script>
 </body>
 </html>
