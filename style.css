@@ -108,24 +108,8 @@ html {
     opacity: 0.3;
 }
 
-.card-icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    animation: iconFloat 2s ease-in-out infinite;
-    z-index: 1;
-}
-
-@keyframes iconFloat {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-15px);
-    }
-}
-
 .card-question {
-    font-size: 6rem;
+    font-size: 8rem;
     font-weight: 900;
     color: white;
     text-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
@@ -151,12 +135,18 @@ html {
 }
 
 .card-result {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 900;
-    padding: 40px;
+    padding: 30px 20px;
     text-align: center;
     word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
     width: 100%;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .card-back.impostor {
@@ -217,6 +207,39 @@ html {
 
 .card-container.hidden {
     display: none;
+}
+
+/* Ajustes responsive para palabras largas */
+@media (max-width: 768px) {
+    .card-flip {
+        width: 240px;
+        height: 340px;
+    }
+    
+    .card-question {
+        font-size: 6rem;
+    }
+    
+    .card-result {
+        font-size: 2rem;
+        padding: 20px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-flip {
+        width: 200px;
+        height: 280px;
+    }
+    
+    .card-question {
+        font-size: 5rem;
+    }
+    
+    .card-result {
+        font-size: 1.5rem;
+        padding: 15px 10px;
+    }
 }
 
 body {

@@ -908,6 +908,13 @@ function loadOnlineGame(gameData) {
                 cardBackOral.classList.add('crew');
             }
             cardResultOral.textContent = myWord;
+            
+            // Ajustar tamaño de fuente según longitud de palabra
+            if (myWord.length > 12) {
+                cardResultOral.style.fontSize = '1.8rem';
+            } else if (myWord.length > 8) {
+                cardResultOral.style.fontSize = '2.2rem';
+            }
         }, 1000);
         
         setTimeout(() => {
@@ -948,6 +955,13 @@ function loadOnlineGame(gameData) {
                 cardBackChat.classList.add('crew');
             }
             cardResultChat.textContent = myWord;
+            
+            // Ajustar tamaño de fuente según longitud de palabra
+            if (myWord.length > 12) {
+                cardResultChat.style.fontSize = '1.8rem';
+            } else if (myWord.length > 8) {
+                cardResultChat.style.fontSize = '2.2rem';
+            }
         }, 1000);
         
         setTimeout(() => {
@@ -1445,8 +1459,15 @@ function revealWord(e) {
             cardBack.classList.add('crew');
         }
         
-        // Mostrar la palabra en el reverso
+        // Remover el "?" y mostrar la palabra con ajuste de tamaño
         cardResult.textContent = word;
+        
+        // Ajustar tamaño de fuente según longitud de palabra
+        if (word.length > 12) {
+            cardResult.style.fontSize = '1.8rem';
+        } else if (word.length > 8) {
+            cardResult.style.fontSize = '2.2rem';
+        }
     }, 1000);
     
     // 3. Después de completar la animación (2s), mostrar interfaz normal
