@@ -1,6 +1,11 @@
-# Habilitar compresión GZIP
+# Habilitar compresión GZIP (Técnica 11)
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml application/xhtml+xml application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE application/x-font-ttf application/x-font-opentype font/opentype font/ttf font/eot font/otf
+    
+    # Comprimir todo excepto imágenes ya comprimidas
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|ico|webp)$ no-gzip dont-vary
 </IfModule>
 
 # Habilitar caché del navegador
@@ -50,6 +55,11 @@
     AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/json
 </IfModule>
 
+# Activar Keep-Alive (Técnica 12)
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+</IfModule>
+
 # Seguridad
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
@@ -57,3 +67,8 @@
     Header set X-XSS-Protection "1; mode=block"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# Reducir redirecciones (Técnica 15)
+RewriteEngine On
+RewriteCond %{THE_REQUEST} ^GET.*index\.html [NC]
+RewriteRule (.*?)index\.html(.*) /$1$2 [R=301,NE,L]

@@ -29,10 +29,15 @@
     <meta name="apple-mobile-web-app-title" content="El Impostor">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Preconnect for Performance -->
+    <!-- Preconnect for Performance (Técnicas 7, 9) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://0.peerjs.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    
+    <!-- Preload Critical Resources (Técnica 9) -->
+    <link rel="preload" href="style.css?v=2" as="style">
+    <link rel="preload" href="game-peer.js" as="script">
     
     <!-- Icons -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🎭</text></svg>">
@@ -404,8 +409,18 @@
         <p> 2025 El Impostor - Creado por <strong>Sebastián</strong></p>
     </footer>
     
-    <!-- PeerJS - Conexión P2P gratuita -->
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer></script>
+    <!-- PeerJS - Conexión P2P gratuita (Técnica 10: CDN) -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer async></script>
     <script src="game-peer.js" defer></script>
+    
+    <!-- Service Worker para PWA y Caché Offline -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>
