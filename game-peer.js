@@ -134,10 +134,8 @@ let playerScores = {}; // { playerId: points }
 let currentImpostors = []; // IDs de los impostores actuales
 let currentRound = 1; // Ronda actual (cada ronda vale más puntos)
 
-// DOM Elements - Name Screen
-const nameScreen = document.getElementById('name-screen');
-const playerNameInput = document.getElementById('player-name-input');
-const continueBtn = document.getElementById('continue-btn');
+// DOM Elements - Welcome Screen
+const welcomeScreen = document.getElementById('welcome-screen');
 
 // DOM Elements - Mode Selection
 const modeScreen = document.getElementById('mode-screen');
@@ -238,6 +236,19 @@ const rulesModal = document.getElementById('rules-modal');
 const showRulesBtn = document.getElementById('show-rules-btn');
 const closeRulesBtn = document.getElementById('close-rules-btn');
 
+// Event Listeners - Welcome Screen
+welcomeScreen.addEventListener('click', () => {
+    // Agregar animación de salida
+    welcomeScreen.classList.add('exit');
+    
+    // Esperar a que termine la animación
+    setTimeout(() => {
+        welcomeScreen.classList.add('hidden');
+        modeScreen.classList.remove('hidden');
+        modeScreen.classList.add('mode-screen-enter');
+    }, 800);
+});
+
 // Event Listeners - Rules Modal
 showRulesBtn.addEventListener('click', () => {
     rulesModal.classList.remove('hidden');
@@ -304,23 +315,7 @@ copyCodeBtn.addEventListener('click', () => {
     }, 2000);
 });
 
-// Event Listener - Name Screen
-continueBtn.addEventListener('click', () => {
-    const name = playerNameInput.value.trim();
-    if (name) {
-        gameState.playerName = name;
-        nameScreen.classList.add('hidden');
-        modeScreen.classList.remove('hidden');
-    } else {
-        showToast('Por favor ingresa tu nombre', 'error', 'Nombre requerido');
-    }
-});
-
-playerNameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        continueBtn.click();
-    }
-});
+// Nombre se pide en el lobby online ahora
 
 playerNameLobby.addEventListener('input', (e) => {
     if (gameState.roomCode && e.target.value.trim()) {
