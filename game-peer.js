@@ -1374,46 +1374,45 @@ function revealWord(e) {
     
     gameState.revealed = true;
     
-    // Referencias al sobre
-    const envelopeContainer = document.getElementById('envelope-container');
-    const envelope = document.querySelector('.envelope');
-    const cardContent = document.getElementById('card-content');
+    // Referencias a la carta
+    const cardContainer = document.getElementById('card-container');
+    const cardFlip = document.getElementById('card-flip');
+    const cardBack = document.getElementById('card-back');
+    const cardResult = document.getElementById('card-result');
     
-    // 1. Abrir el sobre
-    envelope.classList.add('opening');
+    // 1. Iniciar animación de volteo (lento → rápido)
+    cardFlip.classList.add('flipping');
     
-    // 2. Después de 0.8s, revelar el contenido
+    // 2. A la mitad de la animación (1s), preparar el reverso
     setTimeout(() => {
         // Cambiar tema de color según el rol
         document.body.classList.remove('impostor-theme', 'crew-theme');
         if (isImpostor) {
             document.body.classList.add('impostor-theme');
-            cardContent.classList.add('impostor');
+            cardBack.classList.add('impostor');
         } else {
             document.body.classList.add('crew-theme');
-            cardContent.classList.add('crew');
+            cardBack.classList.add('crew');
         }
         
-        // Remover el "?" y mostrar la palabra
-        cardContent.innerHTML = `<div class="word-reveal">${word}</div>`;
-        cardContent.classList.add('revealed');
+        // Mostrar la palabra en el reverso
+        cardResult.textContent = word;
+    }, 1000);
+    
+    // 3. Después de completar la animación (2s), mostrar interfaz normal
+    setTimeout(() => {
+        cardContainer.classList.add('hidden');
+        wordDisplay.textContent = word;
+        wordDisplay.style.color = isImpostor ? '#e74c3c' : '#2ecc71';
+        revealCard.classList.remove('hidden');
         
-        // 3. Después de 2s más, ocultar el sobre y mostrar la card normal
-        setTimeout(() => {
-            envelopeContainer.classList.add('hidden');
-            wordDisplay.textContent = word;
-            wordDisplay.style.color = isImpostor ? '#e74c3c' : '#2ecc71';
-            revealCard.classList.remove('hidden');
-            
-            if (gameState.currentPlayer < gameState.players) {
-                nextPlayerButton.classList.remove('hidden');
-            } else {
-                // Mostrar botones de fin de juego
-                gameEndButtons.classList.remove('hidden');
-            }
-        }, 2000);
-        
-    }, 800);
+        if (gameState.currentPlayer < gameState.players) {
+            nextPlayerButton.classList.remove('hidden');
+        } else {
+            // Mostrar botones de fin de juego
+            gameEndButtons.classList.remove('hidden');
+        }
+    }, 2500);
 }
 
 function nextPlayer() {
@@ -1423,15 +1422,16 @@ function nextPlayer() {
     // Resetear tema al pasar al siguiente jugador
     document.body.classList.remove('impostor-theme', 'crew-theme');
     
-    // Resetear el sobre
-    const envelopeContainer = document.getElementById('envelope-container');
-    const envelope = document.querySelector('.envelope');
-    const cardContent = document.getElementById('card-content');
+    // Resetear la carta
+    const cardContainer = document.getElementById('card-container');
+    const cardFlip = document.getElementById('card-flip');
+    const cardBack = document.getElementById('card-back');
+    const cardResult = document.getElementById('card-result');
     
-    envelopeContainer.classList.remove('hidden');
-    envelope.classList.remove('opening');
-    cardContent.classList.remove('revealed', 'impostor', 'crew');
-    cardContent.innerHTML = '<div class="mystery">?</div>';
+    cardContainer.classList.remove('hidden');
+    cardFlip.classList.remove('flipping');
+    cardBack.classList.remove('impostor', 'crew');
+    cardResult.textContent = '?';
     
     currentPlayerNumber.textContent = gameState.currentPlayer;
     revealCard.classList.add('hidden');
