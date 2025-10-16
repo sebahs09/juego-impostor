@@ -566,9 +566,24 @@ h3 {
 }
 
 .divider {
-    color: #c7d2fe;
+    color: rgba(255, 255, 255, 0.5);
     font-weight: 600;
-    margin: 10px 0;
+    margin: 15px 0;
+    font-size: 1.1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    margin: 0 15px;
 }
 
 .share-link {
@@ -607,6 +622,59 @@ h3 {
     border-color: rgba(88, 86, 214, 0.6);
 }
 
+/* Botones principales */
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 15px rgba(102, 126, 234, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 400px;
+    height: 400px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 25px rgba(102, 126, 234, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+        0 0 30px rgba(118, 75, 162, 0.4);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
 .btn-small {
     background: #5856d6;
     color: white;
@@ -625,26 +693,20 @@ h3 {
     transform: translateY(-1px);
 }
 
-.btn:hover {
-    background: #6b69e0;
-    transform: translateY(-1px);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     color: #e0e0e0;
     position: relative;
     z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.12);
     border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .game-end-buttons {
