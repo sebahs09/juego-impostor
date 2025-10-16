@@ -1372,26 +1372,48 @@ function revealWord(e) {
     const isImpostor = gameState.impostorIndices.includes(playerIndex);
     const word = isImpostor ? "IMPOSTOR" : gameState.playerWords[playerIndex];
     
-    // Cambiar tema de color según el rol
-    document.body.classList.remove('impostor-theme', 'crew-theme');
-    if (isImpostor) {
-        document.body.classList.add('impostor-theme');
-    } else {
-        document.body.classList.add('crew-theme');
-    }
-    
-    wordDisplay.textContent = word;
-    wordDisplay.style.color = isImpostor ? '#e74c3c' : '#2ecc71';
-    
-    revealCard.classList.remove('hidden');
     gameState.revealed = true;
     
-    if (gameState.currentPlayer < gameState.players) {
-        nextPlayerButton.classList.remove('hidden');
-    } else {
-        // Mostrar botones de fin de juego
-        gameEndButtons.classList.remove('hidden');
-    }
+    // Referencias al sobre
+    const envelopeContainer = document.getElementById('envelope-container');
+    const envelope = document.querySelector('.envelope');
+    const cardContent = document.getElementById('card-content');
+    
+    // 1. Abrir el sobre
+    envelope.classList.add('opening');
+    
+    // 2. Después de 0.8s, revelar el contenido
+    setTimeout(() => {
+        // Cambiar tema de color según el rol
+        document.body.classList.remove('impostor-theme', 'crew-theme');
+        if (isImpostor) {
+            document.body.classList.add('impostor-theme');
+            cardContent.classList.add('impostor');
+        } else {
+            document.body.classList.add('crew-theme');
+            cardContent.classList.add('crew');
+        }
+        
+        // Remover el "?" y mostrar la palabra
+        cardContent.innerHTML = `<div class="word-reveal">${word}</div>`;
+        cardContent.classList.add('revealed');
+        
+        // 3. Después de 2s más, ocultar el sobre y mostrar la card normal
+        setTimeout(() => {
+            envelopeContainer.classList.add('hidden');
+            wordDisplay.textContent = word;
+            wordDisplay.style.color = isImpostor ? '#e74c3c' : '#2ecc71';
+            revealCard.classList.remove('hidden');
+            
+            if (gameState.currentPlayer < gameState.players) {
+                nextPlayerButton.classList.remove('hidden');
+            } else {
+                // Mostrar botones de fin de juego
+                gameEndButtons.classList.remove('hidden');
+            }
+        }, 2000);
+        
+    }, 800);
 }
 
 function nextPlayer() {
@@ -1400,6 +1422,16 @@ function nextPlayer() {
     
     // Resetear tema al pasar al siguiente jugador
     document.body.classList.remove('impostor-theme', 'crew-theme');
+    
+    // Resetear el sobre
+    const envelopeContainer = document.getElementById('envelope-container');
+    const envelope = document.querySelector('.envelope');
+    const cardContent = document.getElementById('card-content');
+    
+    envelopeContainer.classList.remove('hidden');
+    envelope.classList.remove('opening');
+    cardContent.classList.remove('revealed', 'impostor', 'crew');
+    cardContent.innerHTML = '<div class="mystery">?</div>';
     
     currentPlayerNumber.textContent = gameState.currentPlayer;
     revealCard.classList.add('hidden');
