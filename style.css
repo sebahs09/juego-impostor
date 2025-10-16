@@ -4,19 +4,37 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
-    background: #0a0a0f;
-    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    transition: background 0.5s ease;
     position: relative;
     overflow-x: hidden;
+}
+
+body.impostor-theme {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+body.impostor-theme .container {
+    border: 2px solid rgba(231, 76, 60, 0.5);
+    box-shadow: 0 0 40px rgba(231, 76, 60, 0.3);
+}
+
+body.crew-theme {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+body.crew-theme .container {
+    border: 2px solid rgba(46, 204, 113, 0.5);
+    box-shadow: 0 0 40px rgba(46, 204, 113, 0.3);
 }
 
 body::before {

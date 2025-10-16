@@ -375,11 +375,15 @@ toggleWordChatBtn.addEventListener('click', () => {
 backToLobbyBtn.addEventListener('click', () => {
     onlineGameScreen.classList.add('hidden');
     lobbyScreen.classList.remove('hidden');
+    // Resetear tema
+    document.body.classList.remove('impostor-theme', 'crew-theme');
 });
 
 backToLobbyChatBtn.addEventListener('click', () => {
     chatGameScreen.classList.add('hidden');
     lobbyScreen.classList.remove('hidden');
+    // Resetear tema
+    document.body.classList.remove('impostor-theme', 'crew-theme');
 });
 
 // Event Listeners - Turns
@@ -726,6 +730,8 @@ function setupConnectionHandlers(conn) {
                 lobbyScreen.classList.remove('hidden');
                 victoryButtonsOral.classList.add('hidden');
                 victoryButtonsChat.classList.add('hidden');
+                // Resetear tema
+                document.body.classList.remove('impostor-theme', 'crew-theme');
                 // Sincronizar ronda
                 if (data.round) {
                     currentRound = data.round;
@@ -873,6 +879,14 @@ function loadOnlineGame(gameData) {
     playerOrder = gameData.turnOrder || Object.keys(roomPlayers);
     currentTurnIndex = 0;
     turnsFinished = false;
+    
+    // Cambiar tema de color según el rol
+    document.body.classList.remove('impostor-theme', 'crew-theme');
+    if (isImpostor) {
+        document.body.classList.add('impostor-theme');
+    } else {
+        document.body.classList.add('crew-theme');
+    }
     
     if (gameData.mode === 'oral') {
         onlineGameScreen.classList.remove('hidden');
@@ -1056,6 +1070,9 @@ function declareWinner(winner, mode) {
         chatGameScreen.classList.add('hidden');
     }
     lobbyScreen.classList.remove('hidden');
+    
+    // Resetear tema
+    document.body.classList.remove('impostor-theme', 'crew-theme');
     
     // Resetear UI
     victoryButtonsOral.classList.add('hidden');
@@ -1354,6 +1371,14 @@ function revealWord(e) {
     const playerIndex = gameState.currentPlayer - 1;
     const isImpostor = gameState.impostorIndices.includes(playerIndex);
     const word = isImpostor ? "IMPOSTOR" : gameState.playerWords[playerIndex];
+    
+    // Cambiar tema de color según el rol
+    document.body.classList.remove('impostor-theme', 'crew-theme');
+    if (isImpostor) {
+        document.body.classList.add('impostor-theme');
+    } else {
+        document.body.classList.add('crew-theme');
+    }
     
     wordDisplay.textContent = word;
     wordDisplay.style.color = isImpostor ? '#e74c3c' : '#2ecc71';
