@@ -867,6 +867,32 @@ h3 {
     font-size: 1.2rem;
 }
 
+.round-indicator {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.round-indicator span {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.round-indicator strong {
+    color: #ffd700;
+    font-size: 1.1rem;
+}
+
+.round-info {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
 .score-table {
     display: flex;
     flex-direction: column;

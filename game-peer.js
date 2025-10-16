@@ -132,6 +132,7 @@ let playerOrder = [];
 let turnsFinished = false;
 let playerScores = {}; // { playerId: points }
 let currentImpostors = []; // IDs de los impostores actuales
+let currentRound = 1; // Ronda actual (cada ronda vale más puntos)
 
 // DOM Elements - Name Screen
 const nameScreen = document.getElementById('name-screen');
@@ -187,6 +188,8 @@ const themeLobby = document.getElementById('theme-lobby');
 const impostorsLobby = document.getElementById('impostors-lobby');
 const startOnlineGameBtn = document.getElementById('start-online-game');
 const scoreTableEl = document.getElementById('score-table');
+const currentRoundDisplay = document.getElementById('current-round-display');
+const nextRoundPoints = document.getElementById('next-round-points');
 const leaveRoomBtn = document.getElementById('leave-room-btn');
 
 // DOM Elements - Local Setup
@@ -429,6 +432,9 @@ backFromVoteBtn.addEventListener('click', () => {
 
 function createRoom() {
     const roomCode = generateRoomCode();
+    
+    // Resetear ronda
+    currentRound = 1;
     
     // Mostrar indicador de carga
     createRoomBtn.disabled = true;
@@ -680,11 +686,12 @@ function setupConnectionHandlers(conn) {
             case 'update_score':
                 playerScores = data.scores;
                 updateScoreboard();
-                // Mostrar mensaje con nombres de impostores
+                // Mostrar mensaje con nombres de impostores y puntos
+                const pointsText = data.winner === 'impostor' ? ` (+${data.round} pts)` : '';
                 const message = data.winner === 'impostor' 
-                    ? `🔴 El impostor era: ${data.impostorNames}` 
+                    ? `🔴 El impostor era: ${data.impostorNames}${pointsText}` 
                     : `🔵 La tripulación ganó! El impostor era: ${data.impostorNames}`;
-                showToast(message, 'success', 'Fin de Ronda');
+                showToast(message, 'success', `Fin de Ronda ${data.round}`);
                 break;
                 
             case 'back_to_lobby':
@@ -693,6 +700,10 @@ function setupConnectionHandlers(conn) {
                 lobbyScreen.classList.remove('hidden');
                 victoryButtonsOral.classList.add('hidden');
                 victoryButtonsChat.classList.add('hidden');
+                // Sincronizar ronda
+                if (data.round) {
+                    currentRound = data.round;
+                }
                 break;
         }
     });
@@ -995,21 +1006,22 @@ function declareWinner(winner, mode) {
     // Obtener nombres de impostores
     const impostorNames = currentImpostors.map(id => roomPlayers[id]?.name || 'Desconocido').join(', ');
     
-    // Actualizar puntos solo si ganaron los impostores
+    // Actualizar puntos solo si ganaron los impostores (puntos = número de ronda)
     if (winner === 'impostor') {
         currentImpostors.forEach(impostorId => {
             if (!playerScores[impostorId]) {
                 playerScores[impostorId] = 0;
             }
-            playerScores[impostorId]++;
+            playerScores[impostorId] += currentRound; // Suma puntos según la ronda
         });
     }
     
-    // Mostrar mensaje con nombres de impostores
+    // Mostrar mensaje con nombres de impostores y puntos ganados
+    const pointsText = winner === 'impostor' ? ` (+${currentRound} pts)` : '';
     const message = winner === 'impostor' 
-        ? `🔴 El impostor era: ${impostorNames}` 
+        ? `🔴 El impostor era: ${impostorNames}${pointsText}` 
         : `🔵 La tripulación ganó! El impostor era: ${impostorNames}`;
-    showToast(message, 'success', 'Fin de Ronda');
+    showToast(message, 'success', `Fin de Ronda ${currentRound}`);
     
     // Volver al lobby inmediatamente
     if (mode === 'oral') {
@@ -1034,19 +1046,28 @@ function declareWinner(winner, mode) {
             type: 'update_score',
             scores: playerScores,
             winner: winner,
-            impostorNames: impostorNames
+            impostorNames: impostorNames,
+            round: currentRound
         });
     });
+    
+    // Incrementar ronda para la siguiente
+    currentRound++;
     
     // Broadcast volver al lobby
     connections.forEach(conn => {
         conn.send({
-            type: 'back_to_lobby'
+            type: 'back_to_lobby',
+            round: currentRound
         });
     });
 }
 
 function updateScoreboard() {
+    // Actualizar indicador de ronda
+    currentRoundDisplay.textContent = currentRound;
+    nextRoundPoints.textContent = currentRound;
+    
     // Crear array de jugadores con puntos
     const playersWithScores = Object.keys(roomPlayers).map(playerId => ({
         id: playerId,
