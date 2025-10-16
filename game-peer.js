@@ -246,7 +246,7 @@ welcomeScreen.addEventListener('click', () => {
         welcomeScreen.classList.add('hidden');
         modeScreen.classList.remove('hidden');
         modeScreen.classList.add('mode-screen-enter');
-    }, 800);
+    }, 300);
 });
 
 // Event Listeners - Rules Modal
