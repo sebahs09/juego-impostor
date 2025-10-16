@@ -14,27 +14,93 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background 0.5s ease;
+    transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow-x: hidden;
+    animation: backgroundPulse 3s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.05);
+    }
 }
 
 body.impostor-theme {
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    animation: impostorReveal 0.8s ease-out, backgroundPulse 3s ease-in-out infinite;
+}
+
+@keyframes impostorReveal {
+    0% {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        transform: scale(1);
+    }
 }
 
 body.impostor-theme .container {
     border: 2px solid rgba(231, 76, 60, 0.5);
     box-shadow: 0 0 40px rgba(231, 76, 60, 0.3);
+    animation: containerShake 0.5s ease-out;
+}
+
+@keyframes containerShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
 }
 
 body.crew-theme {
     background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    animation: crewReveal 0.8s ease-out, backgroundPulse 3s ease-in-out infinite;
+}
+
+@keyframes crewReveal {
+    0% {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        transform: scale(1);
+    }
 }
 
 body.crew-theme .container {
     border: 2px solid rgba(46, 204, 113, 0.5);
     box-shadow: 0 0 40px rgba(46, 204, 113, 0.3);
+    animation: containerGlow 0.5s ease-out;
+}
+
+@keyframes containerGlow {
+    0% {
+        box-shadow: 0 0 0 rgba(46, 204, 113, 0);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(46, 204, 113, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 40px rgba(46, 204, 113, 0.3);
+    }
 }
 
 body::before {
@@ -527,6 +593,19 @@ h3 {
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.08);
+}
+
+.game-end-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.game-end-buttons .btn {
+    flex: 1;
+    min-width: 200px;
 }
 
 .players-list {

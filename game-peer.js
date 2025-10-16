@@ -229,6 +229,8 @@ const backFromVoteBtn = document.getElementById('back-from-vote');
 // DOM Elements - Game Controls
 const nextPlayerButton = document.getElementById('next-player');
 const playAgainButton = document.getElementById('play-again');
+const gameEndButtons = document.getElementById('game-end-buttons');
+const nextRoundLocalBtn = document.getElementById('next-round-local');
 
 // DOM Elements - Rules Modal
 const rulesModal = document.getElementById('rules-modal');
@@ -340,6 +342,7 @@ startButton.addEventListener('click', startLocalGame);
 // Event Listeners - Game
 nextPlayerButton.addEventListener('click', nextPlayer);
 playAgainButton.addEventListener('click', resetGame);
+nextRoundLocalBtn.addEventListener('click', startNextRoundLocal);
 gameScreen.addEventListener('click', revealWord);
 
 // Event Listeners - Toggle Word (Oral Mode)
@@ -1389,7 +1392,8 @@ function revealWord(e) {
     if (gameState.currentPlayer < gameState.players) {
         nextPlayerButton.classList.remove('hidden');
     } else {
-        playAgainButton.classList.remove('hidden');
+        // Mostrar botones de fin de juego
+        gameEndButtons.classList.remove('hidden');
     }
 }
 
@@ -1397,10 +1401,43 @@ function nextPlayer() {
     gameState.currentPlayer++;
     gameState.revealed = false;
     
+    // Resetear tema al pasar al siguiente jugador
+    document.body.classList.remove('impostor-theme', 'crew-theme');
+    
     currentPlayerNumber.textContent = gameState.currentPlayer;
     revealCard.classList.add('hidden');
     nextPlayerButton.classList.add('hidden');
-    playAgainButton.classList.add('hidden');
+    gameEndButtons.classList.add('hidden');
+    wordDisplay.textContent = '';
+}
+
+function startNextRoundLocal() {
+    // Resetear tema
+    document.body.classList.remove('impostor-theme', 'crew-theme');
+    
+    // Reiniciar el juego con la misma configuración
+    gameState.currentPlayer = 1;
+    gameState.revealed = false;
+    
+    // Generar nuevas palabras
+    const theme = gameState.theme;
+    const words = [...wordDatabase[theme]];
+    const civilianWord = words.splice(Math.floor(Math.random() * words.length), 1)[0];
+    
+    gameState.playerWords = Array(gameState.players).fill(civilianWord);
+    gameState.impostorIndices = [];
+    
+    while (gameState.impostorIndices.length < gameState.impostors) {
+        const randomIndex = Math.floor(Math.random() * gameState.players);
+        if (!gameState.impostorIndices.includes(randomIndex)) {
+            gameState.impostorIndices.push(randomIndex);
+        }
+    }
+    
+    // Resetear UI
+    currentPlayerNumber.textContent = '1';
+    revealCard.classList.add('hidden');
+    gameEndButtons.classList.add('hidden');
     wordDisplay.textContent = '';
 }
 
