@@ -39,6 +39,7 @@ body {
     justify-content: center;
     align-items: center;
     position: relative;
+    transition: background 1s ease-in-out;
 }
 
 .bg {
@@ -52,6 +53,7 @@ body {
     top: 0;
     z-index: 0;
     will-change: transform;
+    transition: background-image 1s ease-in-out, opacity 0.5s ease-in-out;
 }
 
 .bg2 {
@@ -114,6 +116,7 @@ body.crew-theme .container {
     border: 1px solid rgba(255, 255, 255, 0.15);
     position: relative;
     z-index: 10;
+    transition: border-color 1s ease-in-out, box-shadow 1s ease-in-out;
 }
 
 .welcome-screen {
