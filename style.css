@@ -39,7 +39,21 @@ body {
     justify-content: center;
     align-items: center;
     position: relative;
-    transition: background 1s ease-in-out;
+    transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
 }
 
 .bg {
@@ -53,7 +67,7 @@ body {
     top: 0;
     z-index: 0;
     will-change: transform;
-    transition: background-image 1s ease-in-out, opacity 0.5s ease-in-out;
+    transition: background-image 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease-in-out;
 }
 
 .bg2 {
@@ -77,6 +91,21 @@ body {
 
 body.impostor-theme {
     background: #1e0a0a;
+    animation: fadeToRed 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeToRed {
+    0% {
+        background: #0f0f1e;
+    }
+    100% {
+        background: #1e0a0a;
+    }
+}
+
+body.impostor-theme::after {
+    background: radial-gradient(circle, rgba(139, 26, 26, 0.3) 0%, transparent 70%);
+    opacity: 1;
 }
 
 body.impostor-theme .bg {
@@ -92,6 +121,21 @@ body.impostor-theme .container {
 
 body.crew-theme {
     background: #0a1e0f;
+    animation: fadeToGreen 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeToGreen {
+    0% {
+        background: #0f0f1e;
+    }
+    100% {
+        background: #0a1e0f;
+    }
+}
+
+body.crew-theme::after {
+    background: radial-gradient(circle, rgba(26, 92, 58, 0.3) 0%, transparent 70%);
+    opacity: 1;
 }
 
 body.crew-theme .bg {
@@ -116,7 +160,9 @@ body.crew-theme .container {
     border: 1px solid rgba(255, 255, 255, 0.15);
     position: relative;
     z-index: 10;
-    transition: border-color 1s ease-in-out, box-shadow 1s ease-in-out;
+    transition: 
+        border-color 1.5s cubic-bezier(0.4, 0, 0.2, 1), 
+        box-shadow 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .welcome-screen {
