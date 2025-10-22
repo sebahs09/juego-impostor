@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Usuario Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Crear Usuario Admin</h1>
+        
+        <div class="info">
+            <strong>ℹ️ Información:</strong><br>
+            Esta herramienta crea un usuario admin directamente en localStorage.
+        </div>
+
+        <div class="form-group">
+            <label>👤 Usuario:</label>
+            <input type="text" id="username" value="admin" placeholder="Nombre de usuario">
+        </div>
+
+        <div class="form-group">
+            <label>🔑 Contraseña:</label>
+            <input type="password" id="password" value="admin123" placeholder="Contraseña">
+        </div>
+
+        <div class="form-group">
+            <label>📧 Email (opcional):</label>
+            <input type="email" id="email" value="admin@impostor.com" placeholder="Email">
+        </div>
+
+        <button onclick="crearUsuario()">✅ Crear Usuario Admin</button>
+        <button onclick="verUsuarios()" style="background: #28a745;">👁️ Ver Usuarios Existentes</button>
+        <button onclick="limpiarTodo()" style="background: #dc3545;">🗑️ Limpiar Todo</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function crearUsuario() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const result = document.getElementById('result');
+
+            if (!username || !password) {
+                mostrarResultado('❌ Usuario y contraseña son obligatorios', 'error');
+                return;
+            }
+
+            // Obtener usuarios existentes
+            let users = [];
+            try {
+                const usersData = localStorage.getItem('users');
+                if (usersData) {
+                    users = JSON.parse(usersData);
+                }
+            } catch (e) {
+                console.error('Error al leer usuarios:', e);
+            }
+
+            // Verificar si ya existe
+            if (users.find(u => u.username === username)) {
+                mostrarResultado('⚠️ El usuario "' + username + '" ya existe', 'error');
+                return;
+            }
+
+            // Crear nuevo usuario
+            const newUser = {
+                id: Date.now(),
+                username: username,
+                email: email,
+                password: password,
+                avatar: '😀',
+                color: '#667eea',
+                isAdmin: true, // SIEMPRE admin
+                stats: {
+                    gamesPlayed: 0,
+                    winsImpostor: 0,
+                    winsCrew: 0
+                },
+                createdAt: new Date().toISOString()
+            };
+
+            // Agregar a la lista
+            users.push(newUser);
+
+            // Guardar
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+            mostrarResultado(
+                '✅ Usuario creado exitosamente!<br>' +
+                '<strong>Usuario:</strong> ' + username + '<br>' +
+                '<strong>Es Admin:</strong> Sí<br>' +
+                '<strong>Total usuarios:</strong> ' + users.length + '<br><br>' +
+                '🎮 Ahora puedes ir a <a href="index.html">index.html</a> y ya estarás logueado.',
+                'success'
+            );
+        }
+
+        function verUsuarios() {
+            const result = document.getElementById('result');
+            
+            try {
+                const usersData = localStorage.getItem('users');
+                if (!usersData) {
+                    mostrarResultado('📭 No hay usuarios registrados', 'error');
+                    return;
+                }
+
+                const users = JSON.parse(usersData);
+                let html = '<strong>👥 Usuarios Registrados (' + users.length + '):</strong><br><br>';
+                
+                users.forEach((user, index) => {
+                    html += '<strong>' + (index + 1) + '. ' + user.username + '</strong><br>';
+                    html += '   Email: ' + (user.email || 'N/A') + '<br>';
+                    html += '   Admin: ' + (user.isAdmin ? '✅ Sí' : '❌ No') + '<br>';
+                    html += '   Partidas: ' + (user.stats?.gamesPlayed || 0) + '<br><br>';
+                });
+
+                html += '<pre>' + JSON.stringify(users, null, 2) + '</pre>';
+                
+                mostrarResultado(html, 'success');
+            } catch (e) {
+                mostrarResultado('❌ Error al leer usuarios: ' + e.message, 'error');
+            }
+        }
+
+        function limpiarTodo() {
+            if (confirm('⚠️ ¿Estás seguro? Esto eliminará TODOS los usuarios.')) {
+                localStorage.clear();
+                mostrarResultado('🗑️ LocalStorage limpiado completamente', 'success');
+            }
+        }
+
+        function mostrarResultado(mensaje, tipo) {
+            const result = document.getElementById('result');
+            result.innerHTML = mensaje;
+            result.className = 'result ' + tipo;
+            result.style.display = 'block';
+        }
+
+        // Mostrar usuarios al cargar
+        window.onload = function() {
+            const usersData = localStorage.getItem('users');
+            if (usersData) {
+                const users = JSON.parse(usersData);
+                mostrarResultado('ℹ️ Hay ' + users.length + ' usuario(s) registrado(s)', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

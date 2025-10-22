@@ -149,6 +149,8 @@ class AuthSystem {
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-password-confirm').value;
 
+        console.log('📝 Intentando registrar:', username);
+
         // Validaciones
         if (password !== confirmPassword) {
             this.showError('Las contraseñas no coinciden');
@@ -162,13 +164,18 @@ class AuthSystem {
 
         // Verificar si el usuario ya existe
         const users = this.getUsers();
+        console.log('👥 Usuarios existentes:', users.length);
+        console.log('📋 Lista de usuarios:', users.map(u => u.username));
+        
         if (users.find(u => u.username === username)) {
+            console.log('❌ Usuario ya existe:', username);
             this.showError('El usuario ya existe');
             return;
         }
 
         // El primer usuario es admin automáticamente
         const isAdmin = users.length === 0;
+        console.log('👑 Será admin?', isAdmin, '(total usuarios:', users.length + ')');
 
         // Crear nuevo usuario
         const newUser = {
@@ -280,9 +287,16 @@ class AuthSystem {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('mode-screen').classList.remove('hidden');
             
+            // DEBUG: Ver usuario actual
+            console.log('👤 Usuario actual:', this.currentUser);
+            console.log('🔐 Es admin?', this.currentUser?.isAdmin);
+            
             // Mostrar botón de admin si el usuario es admin
             if (this.currentUser && this.currentUser.isAdmin) {
+                console.log('✅ Mostrando botón de admin');
                 document.getElementById('show-admin-panel-btn').classList.remove('hidden');
+            } else {
+                console.log('❌ Usuario NO es admin o no existe');
             }
             
             // Ocultar botón de perfil si es invitado
