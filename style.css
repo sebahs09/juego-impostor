@@ -2064,6 +2064,28 @@ h3 {
     transform: scale(1.05);
 }
 
+.admin-table .admin-toggle-btn {
+    background: rgba(128, 128, 128, 0.2);
+    border: 1px solid #888;
+    color: #bbb;
+    padding: 5px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.admin-table .admin-toggle-btn.admin {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+    color: #6ee7b7;
+}
+
+.admin-table .admin-toggle-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
 .admin-danger-zone {
     background: rgba(239, 68, 68, 0.1);
     border: 2px solid rgba(239, 68, 68, 0.3);

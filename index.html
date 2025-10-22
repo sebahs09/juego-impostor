@@ -75,21 +75,6 @@
     </script>
 </head>
 <body>
-    <!-- Admin Access Button -->
-    <div class="admin-access-btn" id="admin-access-btn">⚙️</div>
-    
-    <!-- Admin Login Dropdown -->
-    <div class="admin-dropdown hidden" id="admin-dropdown">
-        <div class="admin-dropdown-content">
-            <h3>🔐 Acceso Admin</h3>
-            <form id="admin-login-form">
-                <input type="password" id="admin-password" class="form-control" placeholder="Contraseña Admin" required>
-                <button type="submit" class="btn btn-small">Entrar</button>
-            </form>
-            <p class="admin-hint">Pista: admin123</p>
-        </div>
-    </div>
-    
     <div class="bg"></div>
     <div class="bg bg2"></div>
     <div class="bg bg3"></div>
@@ -102,6 +87,7 @@
             <div class="auth-tabs">
                 <button class="auth-tab active" id="login-tab">Iniciar Sesión</button>
                 <button class="auth-tab" id="register-tab">Registrarse</button>
+                <button class="auth-tab" id="guest-tab">Jugar como Invitado</button>
             </div>
             
             <!-- Login Form -->
@@ -135,13 +121,16 @@
                     <label>🔑 Confirmar Contraseña</label>
                     <input type="password" id="register-password-confirm" class="form-control" placeholder="Repite tu contraseña" required>
                 </div>
-                <div class="form-group">
-                    <label>🔐 Código Admin (opcional)</label>
-                    <input type="text" id="register-admin-code" class="form-control" placeholder="Deja vacío si no eres admin">
-                    <small style="color: rgba(255, 255, 255, 0.5); font-size: 0.8rem;">Código: ADMIN2025</small>
-                </div>
                 <button type="submit" class="btn btn-primary">Crear Cuenta</button>
             </form>
+            
+            <!-- Guest Message -->
+            <div id="guest-message" class="auth-form hidden">
+                <p style="text-align: center; color: rgba(255, 255, 255, 0.8); margin-bottom: 20px;">
+                    ⚠️ Modo Invitado: Tus estadísticas no se guardarán
+                </p>
+                <button id="continue-guest-btn" class="btn btn-primary">Continuar como Invitado</button>
+            </div>
             
             <div class="auth-error hidden" id="auth-error"></div>
         </div>
@@ -170,6 +159,7 @@
             </div>
             <button id="show-rules-btn" class="btn btn-secondary">📖 Cómo Jugar</button>
             <button id="show-profile-btn" class="btn btn-secondary">👤 Mi Perfil</button>
+            <button id="show-admin-panel-btn" class="btn btn-secondary hidden">⚙️ Panel Admin</button>
             <button id="logout-btn" class="btn btn-secondary">🚪 Cerrar Sesión</button>
         </div>
 
@@ -332,6 +322,7 @@
                                 <th>Victorias T</th>
                                 <th>WinRate</th>
                                 <th>Fecha Registro</th>
+                                <th>Admin</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>

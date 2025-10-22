@@ -12,39 +12,6 @@ class AdminPanel {
     }
 
     setupEventListeners() {
-        // Toggle admin dropdown
-        const adminBtn = document.getElementById('admin-access-btn');
-        const adminDropdown = document.getElementById('admin-dropdown');
-        
-        adminBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            
-            // Si el usuario actual es admin, acceso directo
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-            if (currentUser && currentUser.isAdmin === true) {
-                this.isAdminLoggedIn = true;
-                this.showAdminPanel();
-                this.showToast(`✅ Bienvenido Admin: ${currentUser.username}`);
-                return;
-            }
-            
-            // Si no es admin, mostrar dropdown de login
-            adminDropdown.classList.toggle('hidden');
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!adminDropdown.contains(e.target) && e.target !== adminBtn) {
-                adminDropdown.classList.add('hidden');
-            }
-        });
-
-        // Admin login form
-        document.getElementById('admin-login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleAdminLogin();
-        });
-
         // Close admin panel
         document.getElementById('close-admin-btn').addEventListener('click', () => {
             this.closeAdminPanel();
@@ -84,30 +51,6 @@ class AdminPanel {
         document.getElementById('export-encrypted-backup-btn').addEventListener('click', () => {
             this.exportEncryptedBackup();
         });
-    }
-
-    handleAdminLogin() {
-        const password = document.getElementById('admin-password').value;
-
-        // Verificar si el usuario actual es admin
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-        const isUserAdmin = currentUser && currentUser.isAdmin === true;
-
-        // Permitir acceso si:
-        // 1. Usuario tiene flag isAdmin
-        // 2. Contraseña correcta
-        if (isUserAdmin || password === this.adminPassword) {
-            this.isAdminLoggedIn = true;
-            document.getElementById('admin-dropdown').classList.add('hidden');
-            this.showAdminPanel();
-            
-            if (isUserAdmin) {
-                this.showToast(`✅ Bienvenido Admin: ${currentUser.username}`);
-            }
-        } else {
-            alert('❌ Contraseña incorrecta');
-            document.getElementById('admin-password').value = '';
-        }
     }
 
     showAdminPanel() {
@@ -205,6 +148,10 @@ class AdminPanel {
             const createdDate = new Date(user.createdAt).toLocaleDateString('es-ES');
             const adminBadge = user.isAdmin ? '<span style="background: #f093fb; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-left: 5px;">ADMIN</span>' : '';
 
+            const adminToggle = user.isAdmin 
+                ? `<button class="admin-toggle-btn admin" onclick="adminPanel.toggleAdmin(${user.id})">✅ Admin</button>`
+                : `<button class="admin-toggle-btn" onclick="adminPanel.toggleAdmin(${user.id})">❌ Usuario</button>`;
+
             tr.innerHTML = `
                 <td class="user-avatar">${user.avatar || '😀'}</td>
                 <td><strong>${user.username}</strong>${adminBadge}</td>
@@ -214,6 +161,7 @@ class AdminPanel {
                 <td>${stats.winsCrew}</td>
                 <td>${winrate}%</td>
                 <td>${createdDate}</td>
+                <td>${adminToggle}</td>
                 <td>
                     <button class="delete-user-btn" onclick="adminPanel.deleteUser(${user.id})">
                         🗑️ Eliminar
@@ -223,6 +171,37 @@ class AdminPanel {
 
             tbody.appendChild(tr);
         });
+    }
+
+    toggleAdmin(userId) {
+        const users = this.getUsers();
+        const user = users.find(u => u.id === userId);
+        
+        if (!user) return;
+        
+        // Toggle admin status
+        user.isAdmin = !user.isAdmin;
+        
+        // Guardar cambios
+        if (window.encryptionSystem) {
+            window.encryptionSystem.saveEncrypted('users_encrypted', users);
+        } else {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        // Actualizar currentUser si es el mismo
+        const currentUser = window.authSystem ? window.authSystem.currentUser : null;
+        if (currentUser && currentUser.id === userId) {
+            currentUser.isAdmin = user.isAdmin;
+            if (window.encryptionSystem) {
+                window.encryptionSystem.saveEncrypted('currentUser_encrypted', currentUser);
+            } else {
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+        }
+        
+        this.loadAdminData();
+        this.showToast(user.isAdmin ? '✅ Usuario promovido a Admin' : '❌ Admin degradado a Usuario');
     }
 
     filterUsers(searchTerm) {

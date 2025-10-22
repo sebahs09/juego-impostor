@@ -27,19 +27,28 @@ class AuthSystem {
     }
 
     setupEventListeners() {
-        // Tabs de Login/Register
+        // Tabs de Login/Register/Guest
         document.getElementById('login-tab').addEventListener('click', () => this.switchTab('login'));
         document.getElementById('register-tab').addEventListener('click', () => this.switchTab('register'));
+        document.getElementById('guest-tab').addEventListener('click', () => this.switchTab('guest'));
 
         // Forms
         document.getElementById('login-form').addEventListener('submit', (e) => this.handleLogin(e));
         document.getElementById('register-form').addEventListener('submit', (e) => this.handleRegister(e));
+        document.getElementById('continue-guest-btn').addEventListener('click', () => this.handleGuest());
 
         // Profile buttons
         document.getElementById('show-profile-btn').addEventListener('click', () => this.showProfile());
         document.getElementById('back-from-profile').addEventListener('click', () => this.hideProfile());
         document.getElementById('logout-btn').addEventListener('click', () => this.logout());
         document.getElementById('save-profile-btn').addEventListener('click', () => this.saveProfile());
+        
+        // Admin panel button
+        document.getElementById('show-admin-panel-btn').addEventListener('click', () => {
+            if (window.adminPanel) {
+                window.adminPanel.showAdminPanel();
+            }
+        });
 
         // Upload photo
         document.getElementById('upload-photo-btn').addEventListener('click', () => {
@@ -61,19 +70,28 @@ class AuthSystem {
     switchTab(tab) {
         const loginTab = document.getElementById('login-tab');
         const registerTab = document.getElementById('register-tab');
+        const guestTab = document.getElementById('guest-tab');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
+        const guestMessage = document.getElementById('guest-message');
+
+        // Reset all
+        loginTab.classList.remove('active');
+        registerTab.classList.remove('active');
+        guestTab.classList.remove('active');
+        loginForm.classList.add('hidden');
+        registerForm.classList.add('hidden');
+        guestMessage.classList.add('hidden');
 
         if (tab === 'login') {
             loginTab.classList.add('active');
-            registerTab.classList.remove('active');
             loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-        } else {
+        } else if (tab === 'register') {
             registerTab.classList.add('active');
-            loginTab.classList.remove('active');
             registerForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
+        } else if (tab === 'guest') {
+            guestTab.classList.add('active');
+            guestMessage.classList.remove('hidden');
         }
     }
 
@@ -112,7 +130,6 @@ class AuthSystem {
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-password-confirm').value;
-        const adminCode = document.getElementById('register-admin-code').value;
 
         // Validaciones
         if (password !== confirmPassword) {
@@ -132,8 +149,8 @@ class AuthSystem {
             return;
         }
 
-        // Verificar código admin
-        const isAdmin = adminCode === 'ADMIN2025';
+        // El primer usuario es admin automáticamente
+        const isAdmin = users.length === 0;
 
         // Crear nuevo usuario
         const newUser = {
@@ -165,10 +182,29 @@ class AuthSystem {
         // Auto login
         this.currentUser = newUser;
         
-        // Mostrar mensaje especial si es admin
+        // Mostrar mensaje especial si es el primer usuario (admin)
         if (isAdmin) {
-            this.showToast('✅ Cuenta ADMIN creada correctamente');
+            this.showToast('✅ Bienvenido! Eres el administrador (primer usuario)');
         }
+        
+        this.showWelcomeScreen();
+    }
+
+    handleGuest() {
+        // Crear usuario invitado temporal (no se guarda)
+        this.currentUser = {
+            id: Date.now(),
+            username: 'Invitado_' + Math.floor(Math.random() * 1000),
+            isGuest: true,
+            isAdmin: false,
+            avatar: '👤',
+            color: '#667eea',
+            stats: {
+                gamesPlayed: 0,
+                winsImpostor: 0,
+                winsCrew: 0
+            }
+        };
         
         this.showWelcomeScreen();
     }
@@ -205,6 +241,16 @@ class AuthSystem {
         setTimeout(() => {
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('mode-screen').classList.remove('hidden');
+            
+            // Mostrar botón de admin si el usuario es admin
+            if (this.currentUser && this.currentUser.isAdmin) {
+                document.getElementById('show-admin-panel-btn').classList.remove('hidden');
+            }
+            
+            // Ocultar botón de perfil si es invitado
+            if (this.currentUser && this.currentUser.isGuest) {
+                document.getElementById('show-profile-btn').classList.add('hidden');
+            }
         }, 2000);
     }
 
@@ -425,12 +471,20 @@ class AuthSystem {
     }
 
     logout() {
-        if (confirm('¿Seguro que quieres cerrar sesión?')) {
-            this.currentUser = null;
-            if (window.encryptionSystem) {
-                localStorage.removeItem('currentUser_encrypted');
+        const message = this.currentUser && this.currentUser.isGuest 
+            ? '¿Salir del modo invitado?' 
+            : '¿Seguro que quieres cerrar sesión?';
+            
+        if (confirm(message)) {
+            // Solo borrar de localStorage si no es invitado
+            if (!this.currentUser || !this.currentUser.isGuest) {
+                if (window.encryptionSystem) {
+                    localStorage.removeItem('currentUser_encrypted');
+                }
+                localStorage.removeItem('currentUser');
             }
-            localStorage.removeItem('currentUser');
+            
+            this.currentUser = null;
             location.reload();
         }
     }
@@ -487,6 +541,9 @@ class AuthSystem {
 
 // Inicializar sistema de autenticación
 const authSystem = new AuthSystem();
+
+// Exponer globalmente para admin panel
+window.authSystem = authSystem;
 
 // Agregar animaciones CSS
 const style = document.createElement('style');
