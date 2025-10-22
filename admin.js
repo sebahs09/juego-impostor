@@ -65,12 +65,20 @@ class AdminPanel {
             this.clearAllStats();
         });
 
+        document.getElementById('clear-analytics-btn').addEventListener('click', () => {
+            this.clearAnalytics();
+        });
+
         document.getElementById('delete-all-users-btn').addEventListener('click', () => {
             this.deleteAllUsers();
         });
 
         document.getElementById('export-data-btn').addEventListener('click', () => {
             this.exportData();
+        });
+
+        document.getElementById('export-analytics-btn').addEventListener('click', () => {
+            this.exportAnalytics();
         });
     }
 
@@ -125,6 +133,10 @@ class AdminPanel {
     loadStats() {
         const users = this.getUsers();
         
+        // Visitas totales
+        const totalVisits = window.analyticsSystem ? window.analyticsSystem.getTotalVisits() : 0;
+        document.getElementById('admin-total-visits').textContent = totalVisits;
+        
         // Total usuarios
         document.getElementById('admin-total-users').textContent = users.length;
 
@@ -136,7 +148,7 @@ class AdminPanel {
         const impostorWins = users.reduce((sum, u) => sum + (u.stats?.winsImpostor || 0), 0);
         document.getElementById('admin-impostor-wins').textContent = impostorWins;
 
-        // Victorias tripulación
+        // Victorias crew
         const crewWins = users.reduce((sum, u) => sum + (u.stats?.winsCrew || 0), 0);
         document.getElementById('admin-crew-wins').textContent = crewWins;
     }
@@ -303,7 +315,21 @@ class AdminPanel {
         link.click();
 
         URL.revokeObjectURL(url);
-        this.showToast('📥 Datos exportados correctamente');
+        this.showToast('📥 Datos de usuarios exportados correctamente');
+    }
+
+    clearAnalytics() {
+        if (window.analyticsSystem && window.analyticsSystem.clearAnalytics()) {
+            this.loadStats();
+            this.showToast('📊 Estadísticas de visitas limpiadas');
+        }
+    }
+
+    exportAnalytics() {
+        if (window.analyticsSystem) {
+            window.analyticsSystem.exportAnalytics();
+            this.showToast('📊 Estadísticas de visitas exportadas');
+        }
     }
 
     getUsers() {

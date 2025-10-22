@@ -258,6 +258,13 @@
             <!-- Admin Stats Overview -->
             <div class="admin-stats-overview">
                 <div class="admin-stat-card">
+                    <div class="admin-stat-icon">📊</div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value" id="admin-total-visits">0</div>
+                        <div class="admin-stat-label">Visitas Totales</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
                     <div class="admin-stat-icon">👥</div>
                     <div class="admin-stat-info">
                         <div class="admin-stat-value" id="admin-total-users">0</div>
@@ -326,9 +333,11 @@
             <!-- Danger Zone -->
             <div class="admin-danger-zone">
                 <h3>⚠️ Zona Peligrosa</h3>
-                <button id="clear-all-stats-btn" class="btn btn-danger">🗑️ Limpiar Todas las Estadísticas</button>
+                <button id="clear-all-stats-btn" class="btn btn-danger">🗑️ Limpiar Estadísticas Usuarios</button>
+                <button id="clear-analytics-btn" class="btn btn-danger">📊 Limpiar Visitas</button>
                 <button id="delete-all-users-btn" class="btn btn-danger">💣 Eliminar Todos los Usuarios</button>
-                <button id="export-data-btn" class="btn">📥 Exportar Datos (JSON)</button>
+                <button id="export-data-btn" class="btn">📥 Exportar Usuarios (JSON)</button>
+                <button id="export-analytics-btn" class="btn">📊 Exportar Visitas (JSON)</button>
             </div>
         </div>
 
@@ -684,9 +693,19 @@
     
     <!-- PeerJS - Conexión P2P gratuita (Técnica 10: CDN) -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer async></script>
+    <script src="analytics.js?v=1"></script>
     <script src="auth.js?v=1"></script>
     <script src="admin.js?v=1"></script>
     <script src="game-peer.js?v=3" defer></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX'); // Reemplazar con tu ID de Google Analytics
+    </script>
     
     <!-- Service Worker para PWA y Caché Offline -->
     <script>
