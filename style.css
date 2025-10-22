@@ -2153,6 +2153,57 @@ h3 {
     font-family: 'Courier New', monospace;
 }
 
+.admin-users-data {
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-users-data h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.admin-users-data .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.users-data-display {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.users-data-display pre {
+    color: #10b981;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.users-data-display::-webkit-scrollbar {
+    width: 8px;
+}
+
+.users-data-display::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.users-data-display::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
 /* Responsive Admin */
 @media (max-width: 768px) {
     .admin-stats-overview {

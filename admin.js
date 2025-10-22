@@ -51,6 +51,15 @@ class AdminPanel {
         document.getElementById('export-encrypted-backup-btn').addEventListener('click', () => {
             this.exportEncryptedBackup();
         });
+
+        // Ver datos de usuarios
+        document.getElementById('show-users-data-btn').addEventListener('click', () => {
+            this.toggleUsersData();
+        });
+
+        document.getElementById('copy-users-data-btn').addEventListener('click', () => {
+            this.copyUsersData();
+        });
     }
 
     showAdminPanel() {
@@ -340,6 +349,50 @@ class AdminPanel {
         } else {
             this.showToast('⚠️ Sistema de encriptación no disponible');
         }
+    }
+
+    toggleUsersData() {
+        const display = document.getElementById('users-data-display');
+        const jsonPre = document.getElementById('users-json');
+        const showBtn = document.getElementById('show-users-data-btn');
+        const copyBtn = document.getElementById('copy-users-data-btn');
+
+        if (display.classList.contains('hidden')) {
+            // Mostrar datos
+            const users = this.getUsers();
+            const formattedData = JSON.stringify(users, null, 2);
+            jsonPre.textContent = formattedData;
+            
+            display.classList.remove('hidden');
+            copyBtn.classList.remove('hidden');
+            showBtn.textContent = '🙈 Ocultar Datos';
+            
+            this.showToast('👁️ Mostrando todos los usuarios - ¡Solo tú puedes ver esto!');
+        } else {
+            // Ocultar datos
+            display.classList.add('hidden');
+            copyBtn.classList.add('hidden');
+            showBtn.textContent = '👁️ Mostrar Datos de Usuarios';
+            jsonPre.textContent = '';
+        }
+    }
+
+    copyUsersData() {
+        const jsonPre = document.getElementById('users-json');
+        const text = jsonPre.textContent;
+
+        navigator.clipboard.writeText(text).then(() => {
+            this.showToast('📋 Datos copiados al portapapeles');
+        }).catch(() => {
+            // Fallback para navegadores viejos
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            this.showToast('📋 Datos copiados al portapapeles');
+        });
     }
 
     getUsers() {
