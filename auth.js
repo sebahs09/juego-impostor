@@ -95,6 +95,7 @@ class AuthSystem {
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-password-confirm').value;
+        const adminCode = document.getElementById('register-admin-code').value;
 
         // Validaciones
         if (password !== confirmPassword) {
@@ -114,6 +115,9 @@ class AuthSystem {
             return;
         }
 
+        // Verificar código admin
+        const isAdmin = adminCode === 'ADMIN2025';
+
         // Crear nuevo usuario
         const newUser = {
             id: Date.now(),
@@ -122,6 +126,7 @@ class AuthSystem {
             password,
             avatar: '😀',
             color: '#667eea',
+            isAdmin: isAdmin,
             stats: {
                 gamesPlayed: 0,
                 winsImpostor: 0,
@@ -137,6 +142,12 @@ class AuthSystem {
         // Auto login
         this.currentUser = newUser;
         localStorage.setItem('currentUser', JSON.stringify(newUser));
+        
+        // Mostrar mensaje especial si es admin
+        if (isAdmin) {
+            this.showToast('✅ Cuenta ADMIN creada correctamente');
+        }
+        
         this.showWelcomeScreen();
     }
 
@@ -194,7 +205,12 @@ class AuthSystem {
 
         // Header
         document.getElementById('profile-avatar-display').textContent = this.currentUser.avatar;
-        document.getElementById('profile-username-display').textContent = this.currentUser.username;
+        
+        // Mostrar badge de admin si corresponde
+        const usernameDisplay = this.currentUser.username;
+        const adminBadge = this.currentUser.isAdmin ? ' <span style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 3px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 700;">ADMIN</span>' : '';
+        document.getElementById('profile-username-display').innerHTML = usernameDisplay + adminBadge;
+        
         document.getElementById('profile-email-display').textContent = this.currentUser.email || '';
 
         // Stats

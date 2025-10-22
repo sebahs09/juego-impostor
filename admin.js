@@ -18,6 +18,17 @@ class AdminPanel {
         
         adminBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            
+            // Si el usuario actual es admin, acceso directo
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser && currentUser.isAdmin === true) {
+                this.isAdminLoggedIn = true;
+                this.showAdminPanel();
+                this.showToast(`✅ Bienvenido Admin: ${currentUser.username}`);
+                return;
+            }
+            
+            // Si no es admin, mostrar dropdown de login
             adminDropdown.classList.toggle('hidden');
         });
 
@@ -66,10 +77,21 @@ class AdminPanel {
     handleAdminLogin() {
         const password = document.getElementById('admin-password').value;
 
-        if (password === this.adminPassword) {
+        // Verificar si el usuario actual es admin
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        const isUserAdmin = currentUser && currentUser.isAdmin === true;
+
+        // Permitir acceso si:
+        // 1. Usuario tiene flag isAdmin
+        // 2. Contraseña correcta
+        if (isUserAdmin || password === this.adminPassword) {
             this.isAdminLoggedIn = true;
             document.getElementById('admin-dropdown').classList.add('hidden');
             this.showAdminPanel();
+            
+            if (isUserAdmin) {
+                this.showToast(`✅ Bienvenido Admin: ${currentUser.username}`);
+            }
         } else {
             alert('❌ Contraseña incorrecta');
             document.getElementById('admin-password').value = '';
@@ -165,10 +187,11 @@ class AdminPanel {
             const totalWins = stats.winsImpostor + stats.winsCrew;
             const winrate = stats.gamesPlayed > 0 ? Math.round((totalWins / stats.gamesPlayed) * 100) : 0;
             const createdDate = new Date(user.createdAt).toLocaleDateString('es-ES');
+            const adminBadge = user.isAdmin ? '<span style="background: #f093fb; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-left: 5px;">ADMIN</span>' : '';
 
             tr.innerHTML = `
                 <td class="user-avatar">${user.avatar || '😀'}</td>
-                <td><strong>${user.username}</strong></td>
+                <td><strong>${user.username}</strong>${adminBadge}</td>
                 <td>${user.email || '-'}</td>
                 <td>${stats.gamesPlayed}</td>
                 <td>${stats.winsImpostor}</td>
