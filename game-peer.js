@@ -717,7 +717,7 @@ function setupConnectionHandlers(conn) {
                 const pointsText = data.winner === 'impostor' ? ` (+${data.round} pts)` : '';
                 const message = data.winner === 'impostor' 
                     ? `🔴 El impostor era: ${data.impostorNames}${pointsText}` 
-                    : `🔵 La tripulación ganó! El impostor era: ${data.impostorNames}`;
+                    : `🔵 La Crew ganó! El impostor era: ${data.impostorNames}`;
                 showToast(message, 'success', `Fin de Ronda ${data.round}`);
                 break;
                 
@@ -804,7 +804,7 @@ function startOnlineGame() {
     }
     
     if (playerCount <= impostorCount) {
-        showToast('Debe haber más civiles que impostores', 'error', 'Configuración Inválida');
+        showToast('Debe haber más miembros Crew que impostores', 'error', 'Configuración Inválida');
         return;
     }
     
@@ -1121,7 +1121,7 @@ function declareWinner(winner, mode) {
     const pointsText = winner === 'impostor' ? ` (+${currentRound} pts)` : '';
     const message = winner === 'impostor' 
         ? `🔴 El impostor era: ${impostorNames}${pointsText}` 
-        : `🔵 La tripulación ganó! El impostor era: ${impostorNames}`;
+        : `🔵 La Crew ganó! El impostor era: ${impostorNames}`;
     showToast(message, 'success', `Fin de Ronda ${currentRound}`);
     
     // Volver al lobby inmediatamente
@@ -1386,7 +1386,7 @@ function startLocalGame() {
     const impostors = parseInt(document.getElementById('impostors').value);
 
     if (players <= impostors) {
-        showToast('Debe haber más civiles que impostores', 'error', 'Configuración Inválida');
+        showToast('Debe haber más miembros Crew que impostores', 'error', 'Configuración Inválida');
         return;
     }
 

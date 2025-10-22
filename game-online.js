@@ -564,11 +564,11 @@ function revealImpostors() {
     const correctVotes = mostVotedPlayers.filter(p => gameState.impostorIndices.includes(p - 1));
     
     if (correctVotes.length > 0) {
-        resultsHTML += '<br><h2 style="color: #2ecc71;">¡Los Civiles Ganan! 🎉</h2>';
+        resultsHTML += '<br><h2 style="color: #2ecc71;">¡La Crew Gana! 🎉</h2>';
         resultsHTML += '<p>Atraparon al impostor correctamente</p>';
     } else {
         resultsHTML += '<br><h2 style="color: #e74c3c;">¡Los Impostores Ganan! 😈</h2>';
-        resultsHTML += '<p>Los civiles votaron incorrectamente</p>';
+        resultsHTML += '<p>La Crew votó incorrectamente</p>';
     }
     
     resultsHTML += '</div>';
