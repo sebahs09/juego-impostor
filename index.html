@@ -75,6 +75,21 @@
     </script>
 </head>
 <body>
+    <!-- Admin Access Button -->
+    <div class="admin-access-btn" id="admin-access-btn">⚙️</div>
+    
+    <!-- Admin Login Dropdown -->
+    <div class="admin-dropdown hidden" id="admin-dropdown">
+        <div class="admin-dropdown-content">
+            <h3>🔐 Acceso Admin</h3>
+            <form id="admin-login-form">
+                <input type="password" id="admin-password" class="form-control" placeholder="Contraseña Admin" required>
+                <button type="submit" class="btn btn-small">Entrar</button>
+            </form>
+            <p class="admin-hint">Pista: admin123</p>
+        </div>
+    </div>
+    
     <div class="bg"></div>
     <div class="bg bg2"></div>
     <div class="bg bg3"></div>
@@ -226,6 +241,90 @@
             </div>
             
             <button id="back-from-profile" class="btn btn-secondary">⬅️ Volver</button>
+        </div>
+
+        <!-- Admin Panel Screen -->
+        <div id="admin-panel-screen" class="screen hidden">
+            <div class="admin-header">
+                <h1>⚙️ Panel de Administración</h1>
+                <button id="close-admin-btn" class="btn btn-secondary">✕ Cerrar</button>
+            </div>
+            
+            <!-- Admin Stats Overview -->
+            <div class="admin-stats-overview">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">👥</div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value" id="admin-total-users">0</div>
+                        <div class="admin-stat-label">Usuarios Registrados</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">🎮</div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value" id="admin-total-games">0</div>
+                        <div class="admin-stat-label">Partidas Totales</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">🔴</div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value" id="admin-impostor-wins">0</div>
+                        <div class="admin-stat-label">Victorias Impostor</div>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon">🔵</div>
+                    <div class="admin-stat-info">
+                        <div class="admin-stat-value" id="admin-crew-wins">0</div>
+                        <div class="admin-stat-label">Victorias Tripulación</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search and Filters -->
+            <div class="admin-search">
+                <input type="text" id="admin-search-input" class="form-control" placeholder="🔍 Buscar usuario...">
+                <select id="admin-sort-select" class="form-control">
+                    <option value="date">Más Recientes</option>
+                    <option value="games">Más Partidas</option>
+                    <option value="wins">Más Victorias</option>
+                    <option value="name">Nombre A-Z</option>
+                </select>
+            </div>
+            
+            <!-- Users Table -->
+            <div class="admin-users-container">
+                <h3>👥 Usuarios Registrados</h3>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Partidas</th>
+                                <th>Victorias I</th>
+                                <th>Victorias T</th>
+                                <th>WinRate</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-tbody">
+                            <!-- Usuarios se cargan dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            <div class="admin-danger-zone">
+                <h3>⚠️ Zona Peligrosa</h3>
+                <button id="clear-all-stats-btn" class="btn btn-danger">🗑️ Limpiar Todas las Estadísticas</button>
+                <button id="delete-all-users-btn" class="btn btn-danger">💣 Eliminar Todos los Usuarios</button>
+                <button id="export-data-btn" class="btn">📥 Exportar Datos (JSON)</button>
+            </div>
         </div>
 
         <!-- Online Mode Selection -->
@@ -581,6 +680,7 @@
     <!-- PeerJS - Conexión P2P gratuita (Técnica 10: CDN) -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer async></script>
     <script src="auth.js?v=1"></script>
+    <script src="admin.js?v=1"></script>
     <script src="game-peer.js?v=3" defer></script>
     
     <!-- Service Worker para PWA y Caché Offline -->
