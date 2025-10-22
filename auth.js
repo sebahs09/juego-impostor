@@ -226,7 +226,13 @@ class AuthSystem {
         }
 
         // Header
-        document.getElementById('profile-avatar-display').textContent = this.currentUser.avatar;
+        const avatarDisplay = document.getElementById('profile-avatar-display');
+        avatarDisplay.textContent = this.currentUser.avatar;
+        
+        // Aplicar el color de fondo guardado
+        if (this.currentUser.color) {
+            avatarDisplay.style.background = `linear-gradient(135deg, ${this.currentUser.color} 0%, ${this.adjustColorBrightness(this.currentUser.color, -30)} 100%)`;
+        }
         
         // Mostrar badge de admin si corresponde
         const usernameDisplay = this.currentUser.username;
@@ -261,7 +267,17 @@ class AuthSystem {
             btn.classList.remove('selected');
         });
         event.target.classList.add('selected');
-        document.getElementById('profile-avatar-display').textContent = avatar;
+        
+        // Actualizar emoji del avatar
+        const avatarDisplay = document.getElementById('profile-avatar-display');
+        avatarDisplay.textContent = avatar;
+        
+        // Mantener el color de fondo si hay uno seleccionado
+        const selectedColor = document.querySelector('.color-option.selected');
+        if (selectedColor && selectedColor.dataset.color) {
+            const color = selectedColor.dataset.color;
+            avatarDisplay.style.background = `linear-gradient(135deg, ${color} 0%, ${this.adjustColorBrightness(color, -30)} 100%)`;
+        }
     }
 
     selectColor(color) {
@@ -269,6 +285,25 @@ class AuthSystem {
             btn.classList.remove('selected');
         });
         event.target.classList.add('selected');
+        
+        // Actualizar el fondo del avatar en tiempo real
+        const avatarDisplay = document.getElementById('profile-avatar-display');
+        if (avatarDisplay && color) {
+            avatarDisplay.style.background = `linear-gradient(135deg, ${color} 0%, ${this.adjustColorBrightness(color, -30)} 100%)`;
+        }
+    }
+    
+    // Función auxiliar para oscurecer/aclarar un color
+    adjustColorBrightness(color, percent) {
+        const num = parseInt(color.replace('#', ''), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255))
+            .toString(16).slice(1);
     }
 
     saveProfile() {
@@ -288,8 +323,13 @@ class AuthSystem {
         const userIndex = users.findIndex(u => u.id === this.currentUser.id);
         if (userIndex !== -1) {
             users[userIndex] = this.currentUser;
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+            if (window.encryptionSystem) {
+                window.encryptionSystem.saveEncrypted('users_encrypted', users);
+                window.encryptionSystem.saveEncrypted('currentUser_encrypted', this.currentUser);
+            } else {
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+            }
         }
 
         // Mostrar confirmación
