@@ -912,7 +912,7 @@ function loadOnlineGame(gameData) {
             } else if (myWord.length > 8) {
                 cardResultOral.style.fontSize = '2.2rem';
             }
-        }, 1000);
+        }, 600);
         
         setTimeout(() => {
             cardContainerOral.classList.add('hidden');
@@ -930,7 +930,7 @@ function loadOnlineGame(gameData) {
             discussionSectionOral.classList.add('hidden');
             updateCurrentTurn('oral');
             backToLobbyBtn.classList.remove('hidden');
-        }, 2500);
+        }, 3200);
         
     } else {
         chatGameScreen.classList.remove('hidden');
@@ -959,7 +959,7 @@ function loadOnlineGame(gameData) {
             } else if (myWord.length > 8) {
                 cardResultChat.style.fontSize = '2.2rem';
             }
-        }, 1000);
+        }, 600);
         
         setTimeout(() => {
             cardContainerChat.classList.add('hidden');
@@ -976,7 +976,7 @@ function loadOnlineGame(gameData) {
             turnSectionChat.classList.remove('hidden');
             discussionSectionChat.classList.add('hidden');
             updateCurrentTurn('chat');
-        }, 2500);
+        }, 3200);
     }
 }
 
@@ -1441,10 +1441,10 @@ function revealWord(e) {
     const cardBack = document.getElementById('card-back');
     const cardResult = document.getElementById('card-result');
     
-    // 1. Iniciar animación de volteo (lento → rápido)
+    // 1. Iniciar animación de volteo estilo blackjack
     cardFlip.classList.add('flipping');
     
-    // 2. A la mitad de la animación (1s), preparar el reverso
+    // 2. A la mitad de la animación (0.6s), preparar el reverso
     setTimeout(() => {
         // Cambiar tema de color según el rol
         document.body.classList.remove('impostor-theme', 'crew-theme');
@@ -1456,7 +1456,7 @@ function revealWord(e) {
             cardBack.classList.add('crew');
         }
         
-        // Remover el "?" y mostrar la palabra con ajuste de tamaño
+        // Mostrar la palabra con ajuste de tamaño
         cardResult.textContent = word;
         
         // Ajustar tamaño de fuente según longitud de palabra
@@ -1465,9 +1465,9 @@ function revealWord(e) {
         } else if (word.length > 8) {
             cardResult.style.fontSize = '2.2rem';
         }
-    }, 1000);
+    }, 600);
     
-    // 3. Después de completar la animación (2s), mostrar interfaz normal
+    // 3. Después de completar animación + mostrar (3.2s), ocultar carta
     setTimeout(() => {
         cardContainer.classList.add('hidden');
         wordDisplay.textContent = word;
@@ -1480,7 +1480,7 @@ function revealWord(e) {
             // Mostrar botones de fin de juego
             gameEndButtons.classList.remove('hidden');
         }
-    }, 2500);
+    }, 3200);
 }
 
 function nextPlayer() {

@@ -54,24 +54,12 @@ html {
 }
 
 .card-flip.flipping {
-    animation: cardFlipAccelerate 2s ease-in forwards;
+    animation: cardFlipBlackjack 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes cardFlipAccelerate {
+@keyframes cardFlipBlackjack {
     0% {
         transform: rotateY(0deg);
-    }
-    20% {
-        transform: rotateY(30deg);
-    }
-    40% {
-        transform: rotateY(90deg);
-    }
-    60% {
-        transform: rotateY(180deg);
-    }
-    80% {
-        transform: rotateY(300deg);
     }
     100% {
         transform: rotateY(180deg);
