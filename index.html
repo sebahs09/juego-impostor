@@ -211,19 +211,31 @@
                     
                     <div class="form-group">
                         <label>😀 Avatar</label>
-                        <div class="avatar-selector">
-                            <button class="avatar-option" data-avatar="😀">😀</button>
-                            <button class="avatar-option" data-avatar="😎">😎</button>
-                            <button class="avatar-option" data-avatar="🤡">🤡</button>
-                            <button class="avatar-option" data-avatar="👽">👽</button>
-                            <button class="avatar-option" data-avatar="🤖">🤖</button>
-                            <button class="avatar-option" data-avatar="👻">👻</button>
-                            <button class="avatar-option" data-avatar="🦊">🦊</button>
-                            <button class="avatar-option" data-avatar="🐼">🐼</button>
-                            <button class="avatar-option" data-avatar="🐸">🐸</button>
-                            <button class="avatar-option" data-avatar="🦁">🦁</button>
-                            <button class="avatar-option" data-avatar="🐯">🐯</button>
-                            <button class="avatar-option" data-avatar="🐨">🐨</button>
+                        
+                        <!-- Opción de subir foto -->
+                        <div class="upload-photo-section">
+                            <input type="file" id="upload-photo" accept="image/*" style="display: none;">
+                            <button type="button" class="btn btn-upload" id="upload-photo-btn">📷 Subir Mi Foto</button>
+                            <small>O elige un emoji:</small>
+                        </div>
+                        
+                        <!-- Selector de categorías -->
+                        <div class="emoji-categories">
+                            <button type="button" class="emoji-cat-btn active" data-category="Caras">😀 Caras</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Animales">🐶 Animales</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Comida">🍕 Comida</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Deportes">⚽ Deportes</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Objetos">💻 Objetos</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Símbolos">❤️ Símbolos</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Gestos">👋 Gestos</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Personas">👨 Personas</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Fantasía">👻 Fantasía</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Naturaleza">🌸 Naturaleza</button>
+                            <button type="button" class="emoji-cat-btn" data-category="Vehículos">🚗 Vehículos</button>
+                        </div>
+                        
+                        <div class="avatar-selector" id="emoji-grid">
+                            <!-- Los emojis se cargan dinámicamente desde emojis.js -->
                         </div>
                     </div>
                     
@@ -703,7 +715,8 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer async></script>
     <script src="encryption.js?v=1"></script>
     <script src="analytics.js?v=1"></script>
-    <script src="auth.js?v=1"></script>
+    <script src="emojis.js?v=1"></script>
+    <script src="auth.js?v=2"></script>
     <script src="admin.js?v=1"></script>
     <script src="game-peer.js?v=3" defer></script>
     

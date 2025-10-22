@@ -41,9 +41,15 @@ class AuthSystem {
         document.getElementById('logout-btn').addEventListener('click', () => this.logout());
         document.getElementById('save-profile-btn').addEventListener('click', () => this.saveProfile());
 
-        // Avatar selector
-        document.querySelectorAll('.avatar-option').forEach(btn => {
-            btn.addEventListener('click', (e) => this.selectAvatar(e.target.dataset.avatar));
+        // Upload photo
+        document.getElementById('upload-photo-btn').addEventListener('click', () => {
+            document.getElementById('upload-photo').click();
+        });
+        document.getElementById('upload-photo').addEventListener('change', (e) => this.handlePhotoUpload(e));
+
+        // Emoji categories
+        document.querySelectorAll('.emoji-cat-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.switchEmojiCategory(e.target.dataset.category, e.target));
         });
 
         // Color selector
@@ -208,8 +214,74 @@ class AuthSystem {
         document.getElementById('mode-screen').classList.add('hidden');
         document.getElementById('profile-screen').classList.remove('hidden');
 
+        // Cargar emojis de la primera categoría
+        this.loadEmojiCategory('Caras');
+
         // Cargar datos del perfil
         this.loadProfileData();
+    }
+
+    loadEmojiCategory(category) {
+        if (!window.EMOJI_CATEGORIES) return;
+        
+        const grid = document.getElementById('emoji-grid');
+        grid.innerHTML = '';
+        
+        const emojis = window.EMOJI_CATEGORIES[category] || [];
+        emojis.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.className = 'avatar-option';
+            btn.type = 'button';
+            btn.dataset.avatar = emoji;
+            btn.textContent = emoji;
+            btn.addEventListener('click', () => this.selectAvatar(emoji));
+            grid.appendChild(btn);
+        });
+    }
+
+    switchEmojiCategory(category, btnElement) {
+        document.querySelectorAll('.emoji-cat-btn').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+        this.loadEmojiCategory(category);
+    }
+
+    handlePhotoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                // Redimensionar imagen a 120x120
+                const canvas = document.createElement('canvas');
+                canvas.width = 120;
+                canvas.height = 120;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 120, 120);
+                
+                const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                this.selectCustomPhoto(base64);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    selectCustomPhoto(base64Image) {
+        const avatarDisplay = document.getElementById('profile-avatar-display');
+        
+        // Limpiar selecciones de emojis
+        document.querySelectorAll('.avatar-option').forEach(btn => btn.classList.remove('selected'));
+        
+        // Guardar imagen como avatar
+        avatarDisplay.style.backgroundImage = `url(${base64Image})`;
+        avatarDisplay.style.backgroundSize = 'cover';
+        avatarDisplay.style.backgroundPosition = 'center';
+        avatarDisplay.textContent = '';
+        
+        // Guardar temporalmente para después hacer save
+        this.tempCustomPhoto = base64Image;
     }
 
     hideProfile() {
@@ -227,10 +299,21 @@ class AuthSystem {
 
         // Header
         const avatarDisplay = document.getElementById('profile-avatar-display');
-        avatarDisplay.textContent = this.currentUser.avatar;
         
-        // Aplicar el color de fondo guardado
-        if (this.currentUser.color) {
+        // Si es foto personalizada
+        if (this.currentUser.avatar && this.currentUser.avatar.startsWith('data:image')) {
+            avatarDisplay.style.backgroundImage = `url(${this.currentUser.avatar})`;
+            avatarDisplay.style.backgroundSize = 'cover';
+            avatarDisplay.style.backgroundPosition = 'center';
+            avatarDisplay.textContent = '';
+        } else {
+            // Es un emoji
+            avatarDisplay.style.backgroundImage = 'none';
+            avatarDisplay.textContent = this.currentUser.avatar;
+        }
+        
+        // Aplicar el color de fondo guardado (solo para emojis)
+        if (this.currentUser.color && !this.currentUser.avatar.startsWith('data:image')) {
             avatarDisplay.style.background = `linear-gradient(135deg, ${this.currentUser.color} 0%, ${this.adjustColorBrightness(this.currentUser.color, -30)} 100%)`;
         }
         
@@ -311,9 +394,14 @@ class AuthSystem {
         const selectedAvatar = document.querySelector('.avatar-option.selected');
         const selectedColor = document.querySelector('.color-option.selected');
 
-        if (selectedAvatar) {
+        // Si hay foto personalizada, guardarla
+        if (this.tempCustomPhoto) {
+            this.currentUser.avatar = this.tempCustomPhoto;
+            this.tempCustomPhoto = null;
+        } else if (selectedAvatar) {
             this.currentUser.avatar = selectedAvatar.dataset.avatar;
         }
+        
         if (selectedColor) {
             this.currentUser.color = selectedColor.dataset.color;
         }
