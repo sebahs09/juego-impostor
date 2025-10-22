@@ -236,18 +236,15 @@ const rulesModal = document.getElementById('rules-modal');
 const showRulesBtn = document.getElementById('show-rules-btn');
 const closeRulesBtn = document.getElementById('close-rules-btn');
 
-// Event Listeners - Welcome Screen
-welcomeScreen.addEventListener('click', () => {
-    // Agregar animación de salida
-    welcomeScreen.classList.add('exit');
-    
-    // Esperar a que termine la animación
-    setTimeout(() => {
-        welcomeScreen.classList.add('hidden');
-        modeScreen.classList.remove('hidden');
-        modeScreen.classList.add('mode-screen-enter');
-    }, 300);
-});
+// Event Listeners - Welcome Screen (Manejado por auth.js)
+// welcomeScreen.addEventListener('click', () => {
+//     welcomeScreen.classList.add('exit');
+//     setTimeout(() => {
+//         welcomeScreen.classList.add('hidden');
+//         modeScreen.classList.remove('hidden');
+//         modeScreen.classList.add('mode-screen-enter');
+//     }, 300);
+// });
 
 // Event Listeners - Rules Modal
 showRulesBtn.addEventListener('click', () => {
