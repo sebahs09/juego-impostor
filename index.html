@@ -338,6 +338,14 @@
                 <button id="delete-all-users-btn" class="btn btn-danger">💣 Eliminar Todos los Usuarios</button>
                 <button id="export-data-btn" class="btn">📥 Exportar Usuarios (JSON)</button>
                 <button id="export-analytics-btn" class="btn">📊 Exportar Visitas (JSON)</button>
+                <button id="export-encrypted-backup-btn" class="btn">🔐 Backup Encriptado</button>
+            </div>
+            
+            <div class="admin-info-box">
+                <h4>🔐 Información de Seguridad</h4>
+                <p><strong>Encriptación Activa:</strong> Todos los datos de usuarios están encriptados.</p>
+                <p><strong>Clave Secreta:</strong> Solo el administrador tiene acceso a los datos.</p>
+                <p><small>Para cambiar la clave secreta, edita el archivo <code>encryption.js</code> línea 6</small></p>
             </div>
         </div>
 
@@ -693,6 +701,7 @@
     
     <!-- PeerJS - Conexión P2P gratuita (Técnica 10: CDN) -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js" defer async></script>
+    <script src="encryption.js?v=1"></script>
     <script src="analytics.js?v=1"></script>
     <script src="auth.js?v=1"></script>
     <script src="admin.js?v=1"></script>

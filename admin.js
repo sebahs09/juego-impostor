@@ -80,6 +80,10 @@ class AdminPanel {
         document.getElementById('export-analytics-btn').addEventListener('click', () => {
             this.exportAnalytics();
         });
+
+        document.getElementById('export-encrypted-backup-btn').addEventListener('click', () => {
+            this.exportEncryptedBackup();
+        });
     }
 
     handleAdminLogin() {
@@ -237,10 +241,19 @@ class AdminPanel {
 
         const users = this.getUsers();
         const filteredUsers = users.filter(u => u.id !== userId);
-        localStorage.setItem('users', JSON.stringify(filteredUsers));
+        if (window.encryptionSystem) {
+            window.encryptionSystem.saveEncrypted('users_encrypted', filteredUsers);
+        } else {
+            localStorage.setItem('users', JSON.stringify(filteredUsers));
+        }
 
         // Verificar si el usuario actual fue eliminado
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let currentUser = null;
+        if (window.encryptionSystem) {
+            currentUser = window.encryptionSystem.loadEncrypted('currentUser_encrypted');
+        } else {
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        }
         if (currentUser && currentUser.id === userId) {
             localStorage.removeItem('currentUser');
         }
@@ -263,10 +276,19 @@ class AdminPanel {
             };
         });
 
-        localStorage.setItem('users', JSON.stringify(users));
+        if (window.encryptionSystem) {
+            window.encryptionSystem.saveEncrypted('users_encrypted', users);
+        } else {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
         
         // Actualizar usuario actual
-        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let currentUser = null;
+        if (window.encryptionSystem) {
+            currentUser = window.encryptionSystem.loadEncrypted('currentUser_encrypted');
+        } else {
+            currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        }
         if (currentUser) {
             const updatedUser = users.find(u => u.id === currentUser.id);
             if (updatedUser) {
@@ -332,7 +354,22 @@ class AdminPanel {
         }
     }
 
+    exportEncryptedBackup() {
+        if (window.encryptionSystem) {
+            window.encryptionSystem.exportEncryptedBackup();
+            this.showToast('🔐 Backup encriptado exportado - Solo accesible con tu clave secreta');
+        } else {
+            this.showToast('⚠️ Sistema de encriptación no disponible');
+        }
+    }
+
     getUsers() {
+        // Usar sistema de encriptación si está disponible
+        if (window.encryptionSystem) {
+            const users = window.encryptionSystem.loadEncrypted('users_encrypted');
+            return users || [];
+        }
+        // Fallback a localStorage normal
         const users = localStorage.getItem('users');
         return users ? JSON.parse(users) : [];
     }

@@ -7,9 +7,16 @@ class AuthSystem {
 
     init() {
         // Cargar usuario si existe
-        const savedUser = localStorage.getItem('currentUser');
+        let savedUser = null;
+        if (window.encryptionSystem) {
+            savedUser = window.encryptionSystem.loadEncrypted('currentUser_encrypted');
+        } else {
+            const userData = localStorage.getItem('currentUser');
+            savedUser = userData ? JSON.parse(userData) : null;
+        }
+        
         if (savedUser) {
-            this.currentUser = JSON.parse(savedUser);
+            this.currentUser = savedUser;
             this.showWelcomeScreen();
         } else {
             this.showAuthScreen();
@@ -85,7 +92,11 @@ class AuthSystem {
 
         // Login exitoso
         this.currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        if (window.encryptionSystem) {
+            window.encryptionSystem.saveEncrypted('currentUser_encrypted', user);
+        } else {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+        }
         this.showWelcomeScreen();
     }
 
@@ -137,11 +148,16 @@ class AuthSystem {
 
         // Guardar usuario
         users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
+        if (window.encryptionSystem) {
+            window.encryptionSystem.saveEncrypted('users_encrypted', users);
+            window.encryptionSystem.saveEncrypted('currentUser_encrypted', newUser);
+        } else {
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+        }
 
         // Auto login
         this.currentUser = newUser;
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
         
         // Mostrar mensaje especial si es admin
         if (isAdmin) {
@@ -159,6 +175,12 @@ class AuthSystem {
     }
 
     getUsers() {
+        // Usar sistema de encriptación si está disponible
+        if (window.encryptionSystem) {
+            const users = window.encryptionSystem.loadEncrypted('users_encrypted');
+            return users || [];
+        }
+        // Fallback a localStorage normal (compatibilidad)
         const users = localStorage.getItem('users');
         return users ? JSON.parse(users) : [];
     }
@@ -277,6 +299,9 @@ class AuthSystem {
     logout() {
         if (confirm('¿Seguro que quieres cerrar sesión?')) {
             this.currentUser = null;
+            if (window.encryptionSystem) {
+                localStorage.removeItem('currentUser_encrypted');
+            }
             localStorage.removeItem('currentUser');
             location.reload();
         }
