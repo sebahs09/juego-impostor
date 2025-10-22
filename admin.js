@@ -192,10 +192,16 @@ class AdminPanel {
         user.isAdmin = !user.isAdmin;
         
         // Guardar cambios
+        // SIEMPRE guardar en localStorage normal primero
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // También guardar encriptado si está disponible
         if (window.encryptionSystem) {
-            window.encryptionSystem.saveEncrypted('users_encrypted', users);
-        } else {
-            localStorage.setItem('users', JSON.stringify(users));
+            try {
+                window.encryptionSystem.saveEncrypted('users_encrypted', users);
+            } catch (e) {
+                console.error('Error al encriptar:', e);
+            }
         }
         
         // Actualizar currentUser si es el mismo
@@ -229,10 +235,17 @@ class AdminPanel {
 
         const users = this.getUsers();
         const filteredUsers = users.filter(u => u.id !== userId);
+        
+        // SIEMPRE guardar en localStorage normal primero
+        localStorage.setItem('users', JSON.stringify(filteredUsers));
+        
+        // También guardar encriptado si está disponible
         if (window.encryptionSystem) {
-            window.encryptionSystem.saveEncrypted('users_encrypted', filteredUsers);
-        } else {
-            localStorage.setItem('users', JSON.stringify(filteredUsers));
+            try {
+                window.encryptionSystem.saveEncrypted('users_encrypted', filteredUsers);
+            } catch (e) {
+                console.error('Error al encriptar:', e);
+            }
         }
 
         // Verificar si el usuario actual fue eliminado
@@ -264,10 +277,16 @@ class AdminPanel {
             };
         });
 
+        // SIEMPRE guardar en localStorage normal primero
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // También guardar encriptado si está disponible
         if (window.encryptionSystem) {
-            window.encryptionSystem.saveEncrypted('users_encrypted', users);
-        } else {
-            localStorage.setItem('users', JSON.stringify(users));
+            try {
+                window.encryptionSystem.saveEncrypted('users_encrypted', users);
+            } catch (e) {
+                console.error('Error al encriptar:', e);
+            }
         }
         
         // Actualizar usuario actual
@@ -396,14 +415,27 @@ class AdminPanel {
     }
 
     getUsers() {
-        // Usar sistema de encriptación si está disponible
-        if (window.encryptionSystem) {
-            const users = window.encryptionSystem.loadEncrypted('users_encrypted');
-            return users || [];
+        // Primero intentar localStorage normal (más confiable)
+        const usersData = localStorage.getItem('users');
+        if (usersData) {
+            try {
+                return JSON.parse(usersData);
+            } catch (e) {
+                console.error('Error al parsear usuarios:', e);
+            }
         }
-        // Fallback a localStorage normal
-        const users = localStorage.getItem('users');
-        return users ? JSON.parse(users) : [];
+        
+        // Fallback a encriptado si está disponible
+        if (window.encryptionSystem) {
+            try {
+                const users = window.encryptionSystem.loadEncrypted('users_encrypted');
+                if (users) return users;
+            } catch (e) {
+                console.error('Error al desencriptar usuarios:', e);
+            }
+        }
+        
+        return [];
     }
 
     showToast(message) {

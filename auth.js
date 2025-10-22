@@ -8,9 +8,19 @@ class AuthSystem {
     init() {
         // Cargar usuario si existe
         let savedUser = null;
-        if (window.encryptionSystem) {
-            savedUser = window.encryptionSystem.loadEncrypted('currentUser_encrypted');
-        } else {
+        
+        // Intentar cargar de localStorage encriptado primero
+        const encryptedUser = localStorage.getItem('currentUser_encrypted');
+        if (encryptedUser && window.encryptionSystem) {
+            try {
+                savedUser = window.encryptionSystem.loadEncrypted('currentUser_encrypted');
+            } catch (e) {
+                console.error('Error al desencriptar usuario:', e);
+            }
+        }
+        
+        // Fallback a localStorage normal
+        if (!savedUser) {
             const userData = localStorage.getItem('currentUser');
             savedUser = userData ? JSON.parse(userData) : null;
         }
@@ -116,11 +126,19 @@ class AuthSystem {
 
         // Login exitoso
         this.currentUser = user;
+        
+        // SIEMPRE guardar en localStorage normal
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        // También guardar encriptado si está disponible
         if (window.encryptionSystem) {
-            window.encryptionSystem.saveEncrypted('currentUser_encrypted', user);
-        } else {
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            try {
+                window.encryptionSystem.saveEncrypted('currentUser_encrypted', user);
+            } catch (e) {
+                console.error('Error al encriptar:', e);
+            }
         }
+        
         this.showWelcomeScreen();
     }
 
@@ -171,12 +189,19 @@ class AuthSystem {
 
         // Guardar usuario
         users.push(newUser);
+        
+        // SIEMPRE guardar en localStorage normal (backup)
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
+        
+        // También guardar encriptado si está disponible
         if (window.encryptionSystem) {
-            window.encryptionSystem.saveEncrypted('users_encrypted', users);
-            window.encryptionSystem.saveEncrypted('currentUser_encrypted', newUser);
-        } else {
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            try {
+                window.encryptionSystem.saveEncrypted('users_encrypted', users);
+                window.encryptionSystem.saveEncrypted('currentUser_encrypted', newUser);
+            } catch (e) {
+                console.error('Error al encriptar:', e);
+            }
         }
 
         // Auto login
@@ -217,14 +242,27 @@ class AuthSystem {
     }
 
     getUsers() {
-        // Usar sistema de encriptación si está disponible
-        if (window.encryptionSystem) {
-            const users = window.encryptionSystem.loadEncrypted('users_encrypted');
-            return users || [];
+        // Primero intentar localStorage normal (más confiable)
+        const usersData = localStorage.getItem('users');
+        if (usersData) {
+            try {
+                return JSON.parse(usersData);
+            } catch (e) {
+                console.error('Error al parsear usuarios:', e);
+            }
         }
-        // Fallback a localStorage normal (compatibilidad)
-        const users = localStorage.getItem('users');
-        return users ? JSON.parse(users) : [];
+        
+        // Fallback a encriptado si está disponible
+        if (window.encryptionSystem) {
+            try {
+                const users = window.encryptionSystem.loadEncrypted('users_encrypted');
+                if (users) return users;
+            } catch (e) {
+                console.error('Error al desencriptar usuarios:', e);
+            }
+        }
+        
+        return [];
     }
 
     showAuthScreen() {
@@ -457,12 +495,19 @@ class AuthSystem {
         const userIndex = users.findIndex(u => u.id === this.currentUser.id);
         if (userIndex !== -1) {
             users[userIndex] = this.currentUser;
+            
+            // SIEMPRE guardar en localStorage normal
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+            
+            // También guardar encriptado si está disponible
             if (window.encryptionSystem) {
-                window.encryptionSystem.saveEncrypted('users_encrypted', users);
-                window.encryptionSystem.saveEncrypted('currentUser_encrypted', this.currentUser);
-            } else {
-                localStorage.setItem('users', JSON.stringify(users));
-                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                try {
+                    window.encryptionSystem.saveEncrypted('users_encrypted', users);
+                    window.encryptionSystem.saveEncrypted('currentUser_encrypted', this.currentUser);
+                } catch (e) {
+                    console.error('Error al encriptar:', e);
+                }
             }
         }
 
