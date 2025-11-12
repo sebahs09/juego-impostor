@@ -75,6 +75,17 @@ class AuthSystem {
         document.querySelectorAll('.color-option').forEach(btn => {
             btn.addEventListener('click', (e) => this.selectColor(e.target.dataset.color));
         });
+
+        // Password toggle buttons
+        document.getElementById('toggle-login-password').addEventListener('click', () => {
+            this.togglePasswordVisibility('login-password', 'toggle-login-password');
+        });
+        document.getElementById('toggle-register-password').addEventListener('click', () => {
+            this.togglePasswordVisibility('register-password', 'toggle-register-password');
+        });
+        document.getElementById('toggle-register-password-confirm').addEventListener('click', () => {
+            this.togglePasswordVisibility('register-password-confirm', 'toggle-register-password-confirm');
+        });
     }
 
     switchTab(tab) {
@@ -590,6 +601,21 @@ class AuthSystem {
             users[userIndex] = this.currentUser;
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+        }
+    }
+
+    togglePasswordVisibility(inputId, buttonId) {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            button.textContent = '🙈';
+            button.title = 'Ocultar contraseña';
+        } else {
+            input.type = 'password';
+            button.textContent = '👁️';
+            button.title = 'Mostrar contraseña';
         }
     }
 
