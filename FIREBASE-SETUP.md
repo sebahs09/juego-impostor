@@ -161,3 +161,97 @@ Una vez que funcione el modo online:
 ---
 
 **¿Necesitas ayuda?** Revisa la consola del navegador (F12) para ver mensajes de error.
+
+---
+
+# 🚨 SOLUCIÓN: Firebase Viewer "Desconectado"
+
+## **Problema:** `firebase-viewer.html` muestra "Desconectado"
+
+### **Causa Principal: Reglas de Firebase**
+
+Tu Firebase Realtime Database tiene reglas restrictivas que impiden el acceso.
+
+---
+
+## ✅ **SOLUCIÓN INMEDIATA:**
+
+### **Paso 1: Cambiar Reglas de Firebase**
+
+1. Ve a: https://console.firebase.google.com/project/impostor-14769/database
+2. Click en **"Reglas"** (Rules)
+3. **Reemplaza todo** con esto:
+
+```json
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+```
+
+4. Click **"Publicar"** (Publish)
+5. Confirma los cambios
+
+---
+
+### **Paso 2: Probar Conexión**
+
+1. Abre: `firebase-test.html` (archivo creado)
+2. Debería mostrar: "✅ Conectado a Firebase"
+3. Si funciona, abre `firebase-viewer.html`
+4. Ahora debería mostrar: "🟢 Conectado"
+
+---
+
+## 🔧 **Diagnóstico Completo:**
+
+### **Usar `firebase-test.html`:**
+
+Este archivo hace 5 tests:
+1. ✅ Inicializar Firebase
+2. ✅ Verificar conexión  
+3. ✅ Leer datos existentes
+4. ✅ Escribir datos de prueba
+5. ✅ Verificar escritura
+
+**Si algún test falla, te dice exactamente qué está mal.**
+
+---
+
+## 🛡️ **Reglas de Producción (Después):**
+
+Una vez que funcione, cambia a reglas más seguras:
+
+```json
+{
+  "rules": {
+    "users": {
+      ".read": true,
+      ".write": true
+    },
+    "rooms": {
+      ".read": true,
+      ".write": true
+    },
+    "test": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
+```
+
+---
+
+## 🎯 **Orden de Pruebas:**
+
+1. **Cambiar reglas** en Firebase Console
+2. **Probar** `firebase-test.html`
+3. **Si funciona** → Probar `firebase-viewer.html`
+4. **Si funciona** → Probar `index.html` (registro de usuario)
+
+---
+
+**¡El problema es 99% seguro que son las reglas de Firebase!** 🔥

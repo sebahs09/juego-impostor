@@ -371,15 +371,45 @@
         window.addEventListener('load', () => {
             updateStatus('🟡', 'Probando conexión...', 'loading');
             
-            // Test connection
-            const testRef = ref(database, '.info/connected');
-            onValue(testRef, (snapshot) => {
-                if (snapshot.val() === true) {
-                    updateStatus('🟢', 'Conectado a Firebase', 'online');
-                } else {
-                    updateStatus('🔴', 'Desconectado', 'offline');
-                }
-            });
+            // Test connection with better error handling
+            try {
+                const testRef = ref(database, '.info/connected');
+                onValue(testRef, (snapshot) => {
+                    if (snapshot.val() === true) {
+                        updateStatus('🟢', 'Conectado a Firebase Realtime DB', 'online');
+                        console.log('✅ Conexión a Firebase exitosa');
+                    } else {
+                        updateStatus('🔴', 'Desconectado de Firebase', 'offline');
+                        console.log('❌ Sin conexión a Firebase');
+                    }
+                }, (error) => {
+                    console.error('❌ Error de conexión:', error);
+                    updateStatus('🔴', 'Error: ' + error.message, 'offline');
+                    showError('Error de conexión: ' + error.message);
+                });
+
+                // Test básico de lectura
+                setTimeout(async () => {
+                    try {
+                        console.log('🔍 Probando lectura de datos...');
+                        const rootRef = ref(database, '/');
+                        const snapshot = await get(rootRef);
+                        console.log('✅ Lectura exitosa, datos disponibles:', snapshot.exists());
+                        
+                        if (!snapshot.exists()) {
+                            showError('La base de datos está vacía. Registra un usuario primero en index.html');
+                        }
+                    } catch (error) {
+                        console.error('❌ Error en lectura de prueba:', error);
+                        showError('Error de lectura: ' + error.message + '. Verifica las reglas de Firebase.');
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('❌ Error inicializando Firebase:', error);
+                updateStatus('🔴', 'Error de inicialización', 'offline');
+                showError('Error de inicialización: ' + error.message);
+            }
         });
     </script>
 </body>

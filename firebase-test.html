@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Connection Test</h1>
+    <div id="results"></div>
+    <button onclick="runTests()" style="padding: 10px 20px; font-size: 16px;">🔄 Ejecutar Tests</button>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getDatabase, ref, get, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB4TmdQmh07Xn-xLpTGS_NKXWgTWan4Ulk",
+            authDomain: "impostor-14769.firebaseapp.com",
+            databaseURL: "https://impostor-14769-default-rtdb.firebaseio.com",
+            projectId: "impostor-14769",
+            storageBucket: "impostor-14769.firebasestorage.app",
+            messagingSenderId: "972582618245",
+            appId: "1:972582618245:web:adf2a6228687a3a14d95ec",
+            measurementId: "G-R1DQ05C87M"
+        };
+
+        let app, database;
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            document.getElementById('results').appendChild(div);
+            console.log(message);
+        }
+
+        window.runTests = async function() {
+            document.getElementById('results').innerHTML = '';
+            
+            try {
+                // Test 1: Initialize Firebase
+                addResult('🔧 Test 1: Inicializando Firebase...', 'info');
+                app = initializeApp(firebaseConfig);
+                database = getDatabase(app);
+                addResult('✅ Firebase inicializado correctamente', 'success');
+
+                // Test 2: Check connection
+                addResult('🌐 Test 2: Verificando conexión...', 'info');
+                const connectedRef = ref(database, '.info/connected');
+                
+                const connectionPromise = new Promise((resolve) => {
+                    const unsubscribe = onValue(connectedRef, (snapshot) => {
+                        unsubscribe();
+                        resolve(snapshot.val());
+                    });
+                });
+
+                const isConnected = await Promise.race([
+                    connectionPromise,
+                    new Promise(resolve => setTimeout(() => resolve(false), 5000))
+                ]);
+
+                if (isConnected) {
+                    addResult('✅ Conectado a Firebase Realtime Database', 'success');
+                } else {
+                    addResult('❌ No se pudo conectar a Firebase', 'error');
+                    return;
+                }
+
+                // Test 3: Read data
+                addResult('📖 Test 3: Intentando leer datos...', 'info');
+                const rootRef = ref(database, '/');
+                const snapshot = await get(rootRef);
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    addResult(`✅ Datos leídos correctamente. Claves encontradas: ${Object.keys(data).join(', ')}`, 'success');
+                    addResult(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                } else {
+                    addResult('⚠️ La base de datos está vacía', 'warning');
+                }
+
+                // Test 4: Write test data
+                addResult('✏️ Test 4: Intentando escribir datos de prueba...', 'info');
+                const testRef = ref(database, 'test');
+                await set(testRef, {
+                    message: 'Test connection',
+                    timestamp: new Date().toISOString()
+                });
+                addResult('✅ Datos de prueba escritos correctamente', 'success');
+
+                // Test 5: Read test data
+                addResult('🔍 Test 5: Verificando datos escritos...', 'info');
+                const testSnapshot = await get(testRef);
+                if (testSnapshot.exists()) {
+                    addResult('✅ Datos de prueba verificados correctamente', 'success');
+                    addResult(`<pre>${JSON.stringify(testSnapshot.val(), null, 2)}</pre>`, 'info');
+                } else {
+                    addResult('❌ No se pudieron verificar los datos de prueba', 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Error: ${error.message}`, 'error');
+                console.error('Error completo:', error);
+                
+                // Diagnóstico adicional
+                if (error.code) {
+                    addResult(`🔍 Código de error: ${error.code}`, 'warning');
+                }
+                
+                if (error.code === 'permission-denied') {
+                    addResult('🛡️ Error de permisos. Verifica las reglas de Firebase Database.', 'warning');
+                    addResult('💡 Solución: Ve a Firebase Console → Database → Rules y configura las reglas.', 'info');
+                }
+            }
+        };
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 1000);
+        });
+    </script>
+</body>
+</html>
