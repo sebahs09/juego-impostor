@@ -496,7 +496,10 @@ function createRoom() {
         
         roomCodeDisplay.textContent = id;
         shareCode.textContent = id;
-        playerNameLobby.value = gameState.playerName;
+        
+        // Auto-completar nombre según el tipo de usuario
+        setupPlayerNameField();
+        
         hostControls.classList.remove('hidden');
         
         updatePlayersList();
@@ -570,7 +573,10 @@ function joinRoom() {
             
             roomCodeDisplay.textContent = roomCode;
             shareCode.textContent = roomCode;
-            playerNameLobby.value = gameState.playerName;
+            
+            // Auto-completar nombre según el tipo de usuario
+            setupPlayerNameField();
+            gameState.playerName = playerNameLobby.value || 'Jugador';
             hostControls.classList.add('hidden');
             
             joinRoomBtn.disabled = false;
@@ -1714,6 +1720,36 @@ window.addEventListener('beforeunload', (e) => {
         }
     }
 });
+
+// Función para configurar el campo de nombre del jugador
+function setupPlayerNameField() {
+    const currentUser = window.authSystem ? window.authSystem.getCurrentUser() : null;
+    const playerNameInput = document.getElementById('player-name');
+    const playerNameLabel = document.getElementById('player-name-label');
+    const playerNameHint = document.getElementById('player-name-hint');
+    
+    if (currentUser && !currentUser.isGuest) {
+        // Usuario registrado - usar su nombre automáticamente
+        playerNameInput.value = currentUser.username;
+        playerNameInput.disabled = true;
+        playerNameLabel.textContent = `Tu Nombre (${currentUser.username}):`;
+        playerNameHint.classList.remove('hidden');
+        playerNameHint.textContent = 'Usuarios registrados usan su nombre de cuenta automáticamente';
+        
+        // Actualizar gameState
+        gameState.playerName = currentUser.username;
+    } else {
+        // Usuario invitado - puede cambiar su nombre
+        playerNameInput.value = currentUser ? currentUser.username : '';
+        playerNameInput.disabled = false;
+        playerNameLabel.textContent = 'Tu Nombre:';
+        playerNameHint.classList.remove('hidden');
+        playerNameHint.textContent = 'Como invitado, puedes cambiar tu nombre';
+        
+        // Actualizar gameState
+        gameState.playerName = playerNameInput.value || 'Invitado';
+    }
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {

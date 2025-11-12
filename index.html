@@ -424,9 +424,10 @@
                 <div class="code-box" id="share-code"></div>
                 <button id="copy-code-btn" class="btn-small">Copiar Código</button>
             </div>
-            <div class="form-group">
-                <label for="player-name">Tu Nombre:</label>
+            <div class="form-group" id="player-name-group">
+                <label for="player-name" id="player-name-label">Tu Nombre:</label>
                 <input type="text" id="player-name" class="form-control" placeholder="Ingresa tu nombre">
+                <small id="player-name-hint" class="form-hint hidden">Solo los invitados pueden cambiar su nombre</small>
             </div>
             <div id="players-list" class="players-list"></div>
             <div id="host-controls" class="hidden">
