@@ -60,6 +60,11 @@ class AdminPanel {
         document.getElementById('copy-users-data-btn').addEventListener('click', () => {
             this.copyUsersData();
         });
+
+        // Firebase sync button
+        document.getElementById('sync-firebase-btn').addEventListener('click', () => {
+            this.syncFirebase();
+        });
     }
 
     showAdminPanel() {
@@ -412,6 +417,36 @@ class AdminPanel {
             document.body.removeChild(textarea);
             this.showToast('📋 Datos copiados al portapapeles');
         });
+    }
+
+    async syncFirebase() {
+        if (!window.firebaseManager) {
+            this.showToast('❌ Firebase no está disponible', 'error');
+            return;
+        }
+
+        try {
+            const btn = document.getElementById('sync-firebase-btn');
+            btn.disabled = true;
+            btn.textContent = '🔄 Sincronizando...';
+
+            await window.firebaseManager.syncOfflineData();
+            
+            // Recargar datos del admin panel
+            this.loadAdminData();
+            
+            btn.disabled = false;
+            btn.textContent = '🔄 Sincronizar Ahora';
+            
+            this.showToast('✅ Sincronización completada');
+        } catch (error) {
+            console.error('Error sincronizando:', error);
+            this.showToast('❌ Error en la sincronización', 'error');
+            
+            const btn = document.getElementById('sync-firebase-btn');
+            btn.disabled = false;
+            btn.textContent = '🔄 Sincronizar Ahora';
+        }
     }
 
     getUsers() {

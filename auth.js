@@ -116,44 +116,49 @@ class AuthSystem {
         }
     }
 
-    handleLogin(e) {
+    async handleLogin(e) {
         e.preventDefault();
         const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
 
-        // Obtener usuarios registrados
-        const users = this.getUsers();
-        const user = users.find(u => u.username === username);
+        try {
+            // Obtener usuarios registrados
+            const users = await this.getUsers();
+            const user = users.find(u => u.username === username);
 
-        if (!user) {
-            this.showError('Usuario no encontrado');
-            return;
-        }
-
-        if (user.password !== password) {
-            this.showError('Contraseña incorrecta');
-            return;
-        }
-
-        // Login exitoso
-        this.currentUser = user;
-        
-        // SIEMPRE guardar en localStorage normal
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        // También guardar encriptado si está disponible
-        if (window.encryptionSystem) {
-            try {
-                window.encryptionSystem.saveEncrypted('currentUser_encrypted', user);
-            } catch (e) {
-                console.error('Error al encriptar:', e);
+            if (!user) {
+                this.showError('Usuario no encontrado');
+                return;
             }
+
+            if (user.password !== password) {
+                this.showError('Contraseña incorrecta');
+                return;
+            }
+
+            // Login exitoso
+            this.currentUser = user;
+            
+            // SIEMPRE guardar en localStorage normal
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // También guardar encriptado si está disponible
+            if (window.encryptionSystem) {
+                try {
+                    window.encryptionSystem.saveEncrypted('currentUser_encrypted', user);
+                } catch (e) {
+                    console.error('Error al encriptar:', e);
+                }
+            }
+            
+            this.showWelcomeScreen();
+        } catch (error) {
+            console.error('Error en login:', error);
+            this.showError('Error al iniciar sesión');
         }
-        
-        this.showWelcomeScreen();
     }
 
-    handleRegister(e) {
+    async handleRegister(e) {
         e.preventDefault();
         const username = document.getElementById('register-username').value;
         const email = document.getElementById('register-email').value;
@@ -162,75 +167,91 @@ class AuthSystem {
 
         console.log('📝 Intentando registrar:', username);
 
-        // Validaciones
-        if (password !== confirmPassword) {
-            this.showError('Las contraseñas no coinciden');
-            return;
-        }
-
-        if (password.length < 6) {
-            this.showError('La contraseña debe tener al menos 6 caracteres');
-            return;
-        }
-
-        // Verificar si el usuario ya existe
-        const users = this.getUsers();
-        console.log('👥 Usuarios existentes:', users.length);
-        console.log('📋 Lista de usuarios:', users.map(u => u.username));
-        
-        if (users.find(u => u.username === username)) {
-            console.log('❌ Usuario ya existe:', username);
-            this.showError('El usuario ya existe');
-            return;
-        }
-
-        // El primer usuario es admin automáticamente
-        const isAdmin = users.length === 0;
-        console.log('👑 Será admin?', isAdmin, '(total usuarios:', users.length + ')');
-
-        // Crear nuevo usuario
-        const newUser = {
-            id: Date.now(),
-            username,
-            email,
-            password,
-            avatar: '😀',
-            color: '#667eea',
-            isAdmin: isAdmin,
-            stats: {
-                gamesPlayed: 0,
-                winsImpostor: 0,
-                winsCrew: 0
-            },
-            createdAt: new Date().toISOString()
-        };
-
-        // Guardar usuario
-        users.push(newUser);
-        
-        // SIEMPRE guardar en localStorage normal (backup)
-        localStorage.setItem('users', JSON.stringify(users));
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
-        
-        // También guardar encriptado si está disponible
-        if (window.encryptionSystem) {
-            try {
-                window.encryptionSystem.saveEncrypted('users_encrypted', users);
-                window.encryptionSystem.saveEncrypted('currentUser_encrypted', newUser);
-            } catch (e) {
-                console.error('Error al encriptar:', e);
+        try {
+            // Validaciones
+            if (password !== confirmPassword) {
+                this.showError('Las contraseñas no coinciden');
+                return;
             }
-        }
 
-        // Auto login
-        this.currentUser = newUser;
-        
-        // Mostrar mensaje especial si es el primer usuario (admin)
-        if (isAdmin) {
-            this.showToast('✅ Bienvenido! Eres el administrador (primer usuario)');
+            if (password.length < 6) {
+                this.showError('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            // Verificar si el usuario ya existe
+            const users = await this.getUsers();
+            console.log('👥 Usuarios existentes:', users.length);
+            console.log('📋 Lista de usuarios:', users.map(u => u.username));
+            
+            if (users.find(u => u.username === username)) {
+                console.log('❌ Usuario ya existe:', username);
+                this.showError('El usuario ya existe');
+                return;
+            }
+
+            // El primer usuario es admin automáticamente
+            const isAdmin = users.length === 0;
+            console.log('👑 Será admin?', isAdmin, '(total usuarios:', users.length + ')');
+
+            // Crear nuevo usuario
+            const newUser = {
+                id: Date.now(),
+                username,
+                email,
+                password,
+                avatar: '😀',
+                color: '#667eea',
+                isAdmin: isAdmin,
+                stats: {
+                    gamesPlayed: 0,
+                    winsImpostor: 0,
+                    winsCrew: 0
+                },
+                createdAt: new Date().toISOString()
+            };
+
+            // Guardar usuario en Firebase
+            if (window.firebaseManager) {
+                const result = await window.firebaseManager.saveUser(newUser);
+                if (result.success) {
+                    console.log('✅ Usuario guardado en Firebase');
+                    if (result.offline) {
+                        this.showToast('⚠️ Usuario guardado offline - se sincronizará cuando haya conexión');
+                    }
+                } else {
+                    console.warn('⚠️ Error guardando en Firebase, usando localStorage');
+                }
+            }
+            
+            // SIEMPRE guardar en localStorage normal (backup)
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            // También guardar encriptado si está disponible
+            if (window.encryptionSystem) {
+                try {
+                    window.encryptionSystem.saveEncrypted('users_encrypted', users);
+                    window.encryptionSystem.saveEncrypted('currentUser_encrypted', newUser);
+                } catch (e) {
+                    console.error('Error al encriptar:', e);
+                }
+            }
+
+            // Auto login
+            this.currentUser = newUser;
+            
+            // Mostrar mensaje especial si es el primer usuario (admin)
+            if (isAdmin) {
+                this.showToast('✅ Bienvenido! Eres el administrador (primer usuario)');
+            }
+            
+            this.showWelcomeScreen();
+        } catch (error) {
+            console.error('Error en registro:', error);
+            this.showError('Error al crear la cuenta');
         }
-        
-        this.showWelcomeScreen();
     }
 
     handleGuest() {
@@ -259,8 +280,17 @@ class AuthSystem {
         setTimeout(() => errorDiv.classList.add('hidden'), 3000);
     }
 
-    getUsers() {
-        // Primero intentar localStorage normal (más confiable)
+    async getUsers() {
+        // Usar Firebase si está disponible
+        if (window.firebaseManager) {
+            try {
+                return await window.firebaseManager.getAllUsers();
+            } catch (e) {
+                console.error('Error cargando desde Firebase:', e);
+            }
+        }
+        
+        // Fallback a localStorage normal
         const usersData = localStorage.getItem('users');
         if (usersData) {
             try {
@@ -498,7 +528,7 @@ class AuthSystem {
             .toString(16).slice(1);
     }
 
-    saveProfile() {
+    async saveProfile() {
         // Obtener valores seleccionados
         const selectedAvatar = document.querySelector('.avatar-option.selected');
         const selectedColor = document.querySelector('.color-option.selected');
@@ -515,29 +545,45 @@ class AuthSystem {
             this.currentUser.color = selectedColor.dataset.color;
         }
 
-        // Actualizar en localStorage
-        const users = this.getUsers();
-        const userIndex = users.findIndex(u => u.id === this.currentUser.id);
-        if (userIndex !== -1) {
-            users[userIndex] = this.currentUser;
-            
-            // SIEMPRE guardar en localStorage normal
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
-            
-            // También guardar encriptado si está disponible
-            if (window.encryptionSystem) {
-                try {
-                    window.encryptionSystem.saveEncrypted('users_encrypted', users);
-                    window.encryptionSystem.saveEncrypted('currentUser_encrypted', this.currentUser);
-                } catch (e) {
-                    console.error('Error al encriptar:', e);
+        try {
+            // Actualizar en Firebase
+            if (window.firebaseManager && !this.currentUser.isGuest) {
+                const result = await window.firebaseManager.updateUser(this.currentUser);
+                if (result.success) {
+                    console.log('✅ Perfil actualizado en Firebase');
+                    if (result.offline) {
+                        this.showToast('⚠️ Perfil guardado offline - se sincronizará cuando haya conexión');
+                    }
                 }
             }
-        }
 
-        // Mostrar confirmación
-        this.showToast('✅ Perfil guardado correctamente');
+            // Actualizar en localStorage
+            const users = await this.getUsers();
+            const userIndex = users.findIndex(u => u.id === this.currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex] = this.currentUser;
+                
+                // SIEMPRE guardar en localStorage normal
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+                
+                // También guardar encriptado si está disponible
+                if (window.encryptionSystem) {
+                    try {
+                        window.encryptionSystem.saveEncrypted('users_encrypted', users);
+                        window.encryptionSystem.saveEncrypted('currentUser_encrypted', this.currentUser);
+                    } catch (e) {
+                        console.error('Error al encriptar:', e);
+                    }
+                }
+            }
+
+            // Mostrar confirmación
+            this.showToast('✅ Perfil guardado correctamente');
+        } catch (error) {
+            console.error('Error guardando perfil:', error);
+            this.showToast('⚠️ Error al guardar perfil');
+        }
     }
 
     logout() {

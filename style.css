@@ -1899,6 +1899,45 @@ h3 {
     cursor: not-allowed;
 }
 
+/* Firebase Status */
+.admin-firebase-status {
+    background: rgba(255, 152, 0, 0.1);
+    border: 2px solid rgba(255, 152, 0, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-firebase-status h4 {
+    color: #ff9800;
+    margin-bottom: 15px;
+}
+
+.firebase-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.status-indicator {
+    font-size: 1.2rem;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.online {
+    animation: none;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .stats-grid {

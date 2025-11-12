@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <!-- SEO Meta Tags -->
-    <title>El Impostor - Juego Social Online Multijugador | Deducción y Engaño</title>
+    <title>El Impostor</title>
     <meta name="description" content="Juega al Impostor gratis online. Juego multijugador de deducción social tipo Among Us. Descubre quién es el impostor con amigos. Modo local y online disponibles.">
     <meta name="keywords" content="el impostor, juego impostor, among us español, juego social online, multijugador, deducción, party game, juego gratis">
     <meta name="author" content="Sebastián">
@@ -31,6 +31,7 @@
     
     <!-- Preconnect for Performance (Técnicas 7, 9) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://0.peerjs.com">
     <link rel="dns-prefetch" href="https://unpkg.com">
@@ -48,6 +49,9 @@
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css?v=3">
+    
+    <!-- Firebase -->
+    <script type="module" src="firebase-config.js"></script>
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -368,6 +372,15 @@
                 <p><strong>Encriptación Activa:</strong> Todos los datos de usuarios están encriptados.</p>
                 <p><strong>Clave Secreta:</strong> Solo el administrador tiene acceso a los datos.</p>
                 <p><small>Para cambiar la clave secreta, edita el archivo <code>encryption.js</code> línea 6</small></p>
+            </div>
+            
+            <div class="admin-firebase-status">
+                <h4>🔥 Estado de Firebase</h4>
+                <div id="firebase-status" class="firebase-status">
+                    <span class="status-indicator" id="firebase-indicator">🔴</span>
+                    <span id="firebase-status-text">Conectando...</span>
+                </div>
+                <button id="sync-firebase-btn" class="btn btn-small">🔄 Sincronizar Ahora</button>
             </div>
         </div>
 
